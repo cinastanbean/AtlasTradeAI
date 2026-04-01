@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from atlas_trade_ai.core.store import InMemoryStore
+from datetime import datetime
+
+from atlas_trade_ai.core.store import SQLiteStore
 
 
 class ExceptionService:
-    def __init__(self, store: InMemoryStore) -> None:
+    def __init__(self, store: SQLiteStore) -> None:
         self.store = store
 
     def create_exception(self, payload: dict) -> dict:
@@ -18,16 +20,16 @@ class ExceptionService:
             "owner_id": payload.get("owner_id"),
             "suggestion": payload.get("suggestion"),
             "exception_status": "已发现",
+            "created_at": datetime.now().astimezone().isoformat(),
         }
-        self.store.exceptions[exception_id] = item
-        return item
+        return self.store.save_exception(item)
 
     def list_exceptions(
         self,
         level: str | None = None,
         status: str | None = None,
     ) -> list[dict]:
-        items = list(self.store.exceptions.values())
+        items = self.store.list_exceptions()
         if level:
             items = [item for item in items if item["exception_level"] == level]
         if status:

@@ -87,7 +87,13 @@ class AgentContext:
             Milestone(**item) for item in fulfillment.get("milestones", [])
         ]
         exceptions = [
-            ExceptionContext(**item) for item in fulfillment.get("exceptions", [])
+            ExceptionContext(
+                exception_id=item.get("exception_id", "unknown_exception"),
+                exception_type=item.get("exception_type", "未知异常"),
+                exception_level=item.get("exception_level", "P3"),
+                exception_status=item.get("exception_status", "已发现"),
+            )
+            for item in fulfillment.get("exceptions", [])
         ]
 
         return cls(
@@ -135,6 +141,7 @@ class AgentOutput:
     task_drafts: list[TaskDraft]
     exception_marks: list[ExceptionMark]
     notification_draft: str
+    engine: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -163,4 +170,5 @@ class AgentOutput:
                 for item in self.exception_marks
             ],
             "notification_draft": self.notification_draft,
+            "engine": self.engine,
         }

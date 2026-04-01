@@ -63,3 +63,9 @@ def test_generic_event_still_creates_followup_task() -> None:
     result = FollowUpAgent().run(_build_context("order.status_changed"))
     assert result.risk_assessment.risk_type == "followup_required"
     assert result.task_drafts[0].title == "复核订单状态变化"
+
+
+def test_hybrid_agent_without_api_key_falls_back_to_rules() -> None:
+    result = FollowUpAgent().run(_build_context("document.missing"))
+    assert result.engine["llm_used"] is False
+    assert result.engine["provider"] == "rule-engine"

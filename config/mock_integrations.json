@@ -1,0 +1,241 @@
+{
+  "crm": {
+    "customers": [
+      {
+        "customer_id": "fx_cus_001",
+        "customer_name": "华东重点客户A",
+        "owner_name": "销售一部-王敏",
+        "level": "重点客户",
+        "stage": "成交客户",
+        "country_or_region": "中国",
+        "last_follow_up_time": "2026-04-01T09:30:00+08:00"
+      },
+      {
+        "customer_id": "fx_cus_002",
+        "customer_name": "德国外贸客户B",
+        "owner_name": "外贸部-Linda",
+        "level": "战略客户",
+        "stage": "成交客户",
+        "country_or_region": "德国",
+        "last_follow_up_time": "2026-04-01T10:00:00+08:00"
+      },
+      {
+        "customer_id": "fx_cus_003",
+        "customer_name": "美国渠道客户C",
+        "owner_name": "外贸部-Aaron",
+        "level": "普通客户",
+        "stage": "持续跟进",
+        "country_or_region": "美国",
+        "last_follow_up_time": "2026-03-31T18:20:00+08:00"
+      },
+      {
+        "customer_id": "fx_cus_004",
+        "customer_name": "华南电商客户D",
+        "owner_name": "内销部-陈洁",
+        "level": "成长客户",
+        "stage": "成交客户",
+        "country_or_region": "中国",
+        "last_follow_up_time": "2026-03-30T14:10:00+08:00"
+      }
+    ],
+    "quotations": [
+      {
+        "quotation_id": "fx_q_001",
+        "customer_id": "fx_cus_002",
+        "product_name": "Smart Coffee Grinder",
+        "amount": 48200.0,
+        "currency": "USD",
+        "quotation_status": "accepted"
+      },
+      {
+        "quotation_id": "fx_q_002",
+        "customer_id": "fx_cus_003",
+        "product_name": "Portable Blender",
+        "amount": 76000.0,
+        "currency": "USD",
+        "quotation_status": "pending"
+      },
+      {
+        "quotation_id": "fx_q_003",
+        "customer_id": "fx_cus_004",
+        "product_name": "Domestic Retail Combo Pack",
+        "amount": 56000.0,
+        "currency": "CNY",
+        "quotation_status": "accepted"
+      }
+    ],
+    "followups": [
+      {
+        "followup_id": "fx_f_001",
+        "customer_id": "fx_cus_002",
+        "channel": "email",
+        "summary": "客户确认 4 月首周发货，要求提前提供 CI/PL 草稿。",
+        "followup_time": "2026-03-31T16:00:00+08:00"
+      },
+      {
+        "followup_id": "fx_f_002",
+        "customer_id": "fx_cus_003",
+        "channel": "whatsapp",
+        "summary": "客户要求确认海运 ETA 和包装唛头。",
+        "followup_time": "2026-04-01T08:20:00+08:00"
+      },
+      {
+        "followup_id": "fx_f_003",
+        "customer_id": "fx_cus_001",
+        "channel": "phone",
+        "summary": "客户催问本周五是否可以完成生产并送达。",
+        "followup_time": "2026-04-01T09:00:00+08:00"
+      }
+    ]
+  },
+  "erp": {
+    "orders": [
+      {
+        "order_id": "ord_001",
+        "order_no": "SO-2026-0001",
+        "current_status": "执行中",
+        "business_type": "内销",
+        "customer_name": "华东重点客户A",
+        "planned_delivery_date": "2026-04-10"
+      },
+      {
+        "order_id": "ord_002",
+        "order_no": "SO-2026-0002",
+        "current_status": "待发货",
+        "business_type": "外贸",
+        "customer_name": "德国外贸客户B",
+        "planned_delivery_date": "2026-04-08"
+      },
+      {
+        "order_id": "ord_003",
+        "order_no": "SO-2026-0003",
+        "current_status": "运输 / 交付中",
+        "business_type": "外贸",
+        "customer_name": "美国渠道客户C",
+        "planned_delivery_date": "2026-04-18"
+      },
+      {
+        "order_id": "ord_004",
+        "order_no": "SO-2026-0004",
+        "current_status": "待回款",
+        "business_type": "内销",
+        "customer_name": "华南电商客户D",
+        "planned_delivery_date": "2026-03-20"
+      }
+    ],
+    "production": [
+      {
+        "order_id": "ord_001",
+        "factory_name": "东莞工厂一部",
+        "production_status": "delayed",
+        "milestone_type": "生产完成",
+        "planned_time": "2026-04-05T18:00:00+08:00",
+        "actual_time": null
+      },
+      {
+        "order_id": "ord_002",
+        "factory_name": "宁波工厂二部",
+        "production_status": "completed",
+        "milestone_type": "生产完成",
+        "planned_time": "2026-04-02T18:00:00+08:00",
+        "actual_time": "2026-04-02T16:00:00+08:00"
+      }
+    ],
+    "payments": [
+      {
+        "order_id": "ord_001",
+        "receivable_amount": 128000.0,
+        "received_amount": 0.0,
+        "due_date": "2026-04-30",
+        "payment_status": "pending"
+      },
+      {
+        "order_id": "ord_004",
+        "receivable_amount": 56000.0,
+        "received_amount": 0.0,
+        "due_date": "2026-03-28",
+        "payment_status": "overdue"
+      }
+    ],
+    "inventory": [
+      {
+        "sku_code": "SKU-10001",
+        "sku_name": "Smart Coffee Grinder",
+        "available_qty": 120,
+        "allocated_qty": 80,
+        "warehouse_name": "宁波保税仓"
+      },
+      {
+        "sku_code": "SKU-10002",
+        "sku_name": "Portable Blender",
+        "available_qty": 60,
+        "allocated_qty": 45,
+        "warehouse_name": "深圳成品仓"
+      }
+    ]
+  },
+  "dingtalk": {
+    "todos": [
+      {
+        "todo_id": "dd_t_001",
+        "title": "确认工厂恢复时间",
+        "owner_name": "王敏",
+        "status": "pending",
+        "source": "AtlasTradeAI"
+      },
+      {
+        "todo_id": "dd_t_002",
+        "title": "补齐发货/报关单证",
+        "owner_name": "Linda",
+        "status": "pending",
+        "source": "AtlasTradeAI"
+      },
+      {
+        "todo_id": "dd_t_003",
+        "title": "处理逾期回款",
+        "owner_name": "陈洁",
+        "status": "pending",
+        "source": "AtlasTradeAI"
+      }
+    ],
+    "messages": [
+      {
+        "message_id": "dd_m_001",
+        "template_code": "R002_follow_up_agent",
+        "receiver_name": "王敏",
+        "sent_time": "2026-04-01T09:02:00+08:00",
+        "status": "sent"
+      },
+      {
+        "message_id": "dd_m_002",
+        "template_code": "R006_customs_agent",
+        "receiver_name": "Linda",
+        "sent_time": "2026-04-01T10:05:00+08:00",
+        "status": "sent"
+      },
+      {
+        "message_id": "dd_m_003",
+        "template_code": "R010_finance_agent",
+        "receiver_name": "陈洁",
+        "sent_time": "2026-04-01T09:22:00+08:00",
+        "status": "sent"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "dd_a_001",
+        "title": "加急排产申请",
+        "status": "approved",
+        "approver_name": "供应链经理",
+        "finish_time": "2026-04-01T11:00:00+08:00"
+      },
+      {
+        "approval_id": "dd_a_002",
+        "title": "逾期回款升级处理",
+        "status": "processing",
+        "approver_name": "财务经理",
+        "finish_time": null
+      }
+    ]
+  }
+}

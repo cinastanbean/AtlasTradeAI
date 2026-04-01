@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from atlas_trade_ai.core.store import InMemoryStore
+from datetime import datetime
+
+from atlas_trade_ai.core.store import SQLiteStore
 from atlas_trade_ai.services.workflow_service import WorkflowService
 
 
 class EventService:
     def __init__(
         self,
-        store: InMemoryStore,
+        store: SQLiteStore,
         workflow_service: WorkflowService,
     ) -> None:
         self.store = store
@@ -15,8 +17,11 @@ class EventService:
 
     def write_event(self, payload: dict) -> dict:
         event_id = payload.get("event_id") or self.store.next_id("event")
-        item = payload | {"event_id": event_id}
-        self.store.events[event_id] = item
+        item = payload | {
+            "event_id": event_id,
+            "created_at": payload.get("created_at") or datetime.now().astimezone().isoformat(),
+        }
+        self.store.save_event(item)
         workflow_result = self.workflow_service.process_event(item)
 
         return {
@@ -29,7 +34,7 @@ class EventService:
         }
 
     def list_events(self, order_id: str | None = None) -> list[dict]:
-        items = list(self.store.events.values())
+        items = self.store.list_events()
         if order_id:
             items = [item for item in items if item.get("order_id") == order_id]
         return items

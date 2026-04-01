@@ -18,5 +18,7 @@ class RuleRegistryService:
     def get_rule_for_event(self, event_type: str) -> dict | None:
         for rule in self._workflow_rules["rules"]:
             if rule["event_type"] == event_type:
+                if "subscribers" not in rule and "subscriber" in rule:
+                    rule = rule | {"subscribers": [rule["subscriber"]]}
                 return rule
         return None

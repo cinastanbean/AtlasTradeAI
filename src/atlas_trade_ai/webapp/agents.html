@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent 运行 - AtlasTradeAI</title>
+    <link rel="stylesheet" href="/ui/assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">AtlasTradeAI</div>
+        <nav class="nav">
+          <a class="nav-link" href="/ui/index.html">总览</a>
+          <a class="nav-link" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link active" href="/ui/agents.html">Agent 运行</a>
+          <a class="nav-link" href="/ui/integrations.html">系统集成</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <h1>Agent 运行中心</h1>
+            <p>查看各 Agent 的职责、订阅事件和最近执行结果。</p>
+          </div>
+          <div class="toolbar">
+            <button id="refresh-agents" class="primary">刷新 Agent</button>
+          </div>
+        </header>
+
+        <section class="grid two-col">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>Agent 目录</h2>
+              <span>角色层与职责</span>
+            </div>
+            <div id="agent-catalog" class="list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>执行日志</h2>
+              <span>最近触发的运行记录</span>
+            </div>
+            <div id="agent-runs" class="list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/ui/assets/agents.js"></script>
+  </body>
+</html>

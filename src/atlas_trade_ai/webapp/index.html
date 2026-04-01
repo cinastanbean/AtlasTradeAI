@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AtlasTradeAI 控制台</title>
+    <link rel="stylesheet" href="/ui/assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">AtlasTradeAI</div>
+        <nav class="nav">
+          <a class="nav-link active" href="/ui/index.html">总览</a>
+          <a class="nav-link" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link" href="/ui/agents.html">Agent 运行</a>
+          <a class="nav-link" href="/ui/integrations.html">系统集成</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <h1>订单驱动智能贸易操作系统</h1>
+            <p>从客户经营到履约、交付、回款和售后，统一在一个事件中枢中运行。</p>
+          </div>
+          <div class="toolbar">
+            <button id="refresh-dashboard" class="primary">刷新数据</button>
+          </div>
+        </header>
+
+        <section id="kpis" class="kpi-grid"></section>
+
+        <section class="grid two-col">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>业务主链路</h2>
+              <span>一个中枢 + 六层能力</span>
+            </div>
+            <div id="process-map" class="process-map"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>场景模拟器</h2>
+              <span>用事件驱动系统联动</span>
+            </div>
+            <div id="scenario-list" class="scenario-list"></div>
+            <pre id="scenario-result" class="code-block"></pre>
+          </div>
+        </section>
+
+        <section class="grid two-col">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>高风险订单</h2>
+              <span>当前最值得关注的订单</span>
+            </div>
+            <div id="high-risk-orders" class="list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>最近 Agent 运行</h2>
+              <span>观察系统自动流转</span>
+            </div>
+            <div id="recent-agent-runs" class="list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/ui/assets/dashboard.js"></script>
+  </body>
+</html>

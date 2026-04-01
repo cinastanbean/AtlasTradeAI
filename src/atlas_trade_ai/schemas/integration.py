@@ -8,3 +8,8 @@ class AdapterHealthRead(BaseModel):
     connected: bool
     mode: str
     description: str
+
+
+class IntegrationSnapshotRead(BaseModel):
+    section: str
+    items: list[dict]

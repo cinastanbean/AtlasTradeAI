@@ -45,6 +45,7 @@
 - [MVP 功能边界与优先级清单](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/04-implementation-roadmap/mvp-scope-and-priority-list.md)
 - [功能模块清单与页面结构草案](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/04-implementation-roadmap/functional-modules-and-page-structure-draft.md)
 - [第一版工程骨架说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/04-implementation-roadmap/engineering-skeleton-overview.md)
+- [Demo 平台升级说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/04-implementation-roadmap/demo-platform-upgrade-notes.md)
 
 ## 6. 建议阅读顺序
 

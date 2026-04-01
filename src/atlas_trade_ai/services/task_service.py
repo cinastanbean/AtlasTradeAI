@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from atlas_trade_ai.core.store import InMemoryStore
+from datetime import datetime
+
+from atlas_trade_ai.core.store import SQLiteStore
 
 
 class TaskService:
-    def __init__(self, store: InMemoryStore) -> None:
+    def __init__(self, store: SQLiteStore) -> None:
         self.store = store
 
     def create_task(self, payload: dict) -> dict:
@@ -19,16 +21,16 @@ class TaskService:
             "priority": payload.get("priority", "medium"),
             "due_time": payload.get("due_time"),
             "task_status": "待处理",
+            "created_at": datetime.now().astimezone().isoformat(),
         }
-        self.store.tasks[task_id] = item
-        return item
+        return self.store.save_task(item)
 
     def list_tasks(
         self,
         assignee_id: str | None = None,
         status: str | None = None,
     ) -> list[dict]:
-        items = list(self.store.tasks.values())
+        items = self.store.list_tasks()
         if assignee_id:
             items = [item for item in items if item.get("assignee_id") == assignee_id]
         if status:

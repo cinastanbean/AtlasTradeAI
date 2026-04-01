@@ -22,6 +22,9 @@ class WorkbenchSummary(BaseModel):
     pending_task_count: int
     open_exception_count: int
     event_count: int
+    agent_run_count: int
     high_risk_orders: list[WorkbenchItem]
-    latest_tasks: list[WorkbenchItem]
-    latest_exceptions: list[WorkbenchItem]
+    latest_tasks: list[dict]
+    latest_exceptions: list[dict]
+    latest_agent_runs: list[dict]
+    latest_notifications: list[dict]

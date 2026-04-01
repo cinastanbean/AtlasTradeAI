@@ -1,0 +1,71 @@
+{
+  "scenarios": [
+    {
+      "code": "prod_delay_ord_001",
+      "name": "生产延期：内销订单",
+      "description": "模拟内销订单生产里程碑延期，触发跟单员 Agent。",
+      "event": {
+        "event_type": "production.milestone_delayed",
+        "event_time": "2026-04-01T10:30:00+08:00",
+        "source_system": "kingdee_k3cloud",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_001",
+        "order_id": "ord_001",
+        "customer_id": "cus_001",
+        "priority": "P1",
+        "payload": {
+          "milestone_type": "生产完成",
+          "delay_days": 2,
+          "receivable_amount": 128000.0,
+          "received_amount": 0.0,
+          "due_date": "2026-04-30",
+          "overdue_days": 0
+        }
+      }
+    },
+    {
+      "code": "doc_missing_ord_002",
+      "name": "单证缺失：外贸订单",
+      "description": "模拟外贸订单发货前单证缺失，触发单证异常和跟单动作。",
+      "event": {
+        "event_type": "document.missing",
+        "event_time": "2026-04-01T11:00:00+08:00",
+        "source_system": "atlas_trade_ai",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_002",
+        "order_id": "ord_002",
+        "customer_id": "cus_002",
+        "priority": "P1",
+        "payload": {
+          "document_type": "CI/PL",
+          "missing_items": [
+            "装箱单",
+            "商业发票"
+          ],
+          "deadline": "2026-04-01T16:00:00+08:00"
+        }
+      }
+    },
+    {
+      "code": "payment_overdue_ord_002",
+      "name": "回款逾期：外贸订单",
+      "description": "模拟订单回款逾期，触发财务和跟单协同处理。",
+      "event": {
+        "event_type": "payment.overdue",
+        "event_time": "2026-04-01T15:00:00+08:00",
+        "source_system": "kingdee_k3cloud",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_002",
+        "order_id": "ord_002",
+        "customer_id": "cus_002",
+        "priority": "P1",
+        "payload": {
+          "receivable_amount": 56000.0,
+          "received_amount": 0.0,
+          "due_date": "2026-03-25",
+          "overdue_days": 7
+        }
+      }
+    }
+  ]
+}

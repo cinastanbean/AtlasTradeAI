@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>订单详情 - AtlasTradeAI</title>
+    <link rel="stylesheet" href="/ui/assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">AtlasTradeAI</div>
+        <nav class="nav">
+          <a class="nav-link" href="/ui/index.html">总览</a>
+          <a class="nav-link" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link" href="/ui/agents.html">Agent 运行</a>
+          <a class="nav-link" href="/ui/integrations.html">系统集成</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <h1 id="detail-title">订单详情</h1>
+            <p>查看单张订单的阶段、事件、任务、异常和 Agent 执行轨迹。</p>
+          </div>
+          <div class="toolbar">
+            <a class="secondary-link" href="/ui/orders.html">返回订单看板</a>
+          </div>
+        </header>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>阶段进度</h2>
+            <span>订单生命周期</span>
+          </div>
+          <div id="order-progress" class="process-map"></div>
+        </section>
+
+        <section class="grid two-col">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>事件与任务</h2>
+              <span>自动流转结果</span>
+            </div>
+            <div id="order-events" class="list"></div>
+            <div id="order-tasks" class="list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>异常与 Agent</h2>
+              <span>风险与执行节点</span>
+            </div>
+            <div id="order-exceptions" class="list"></div>
+            <div id="order-agent-runs" class="list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/ui/assets/order-detail.js"></script>
+  </body>
+</html>

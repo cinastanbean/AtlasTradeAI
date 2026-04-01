@@ -20,3 +20,4 @@ class FollowUpAgentRunResponse(BaseModel):
     task_drafts: list[dict[str, Any]]
     exception_marks: list[dict[str, Any]]
     notification_draft: str
+    engine: dict[str, Any] | None = None

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>系统集成 - AtlasTradeAI</title>
+    <link rel="stylesheet" href="/ui/assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">AtlasTradeAI</div>
+        <nav class="nav">
+          <a class="nav-link" href="/ui/index.html">总览</a>
+          <a class="nav-link" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link" href="/ui/agents.html">Agent 运行</a>
+          <a class="nav-link active" href="/ui/integrations.html">系统集成</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <h1>Mock 集成中心</h1>
+            <p>展示纷享销客 CRM、金蝶云星空 ERP、钉钉的伪数据快照，便于完整演示业务流。</p>
+          </div>
+          <div class="toolbar">
+            <button id="refresh-integrations" class="primary">刷新集成数据</button>
+          </div>
+        </header>
+
+        <section class="grid three-col">
+          <div class="panel">
+            <div class="panel-title">
+              <h2>CRM</h2>
+              <span>客户 / 报价 / 跟进</span>
+            </div>
+            <div id="crm-sections" class="list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>ERP</h2>
+              <span>订单 / 生产 / 回款</span>
+            </div>
+            <div id="erp-sections" class="list"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">
+              <h2>钉钉</h2>
+              <span>待办 / 消息 / 审批</span>
+            </div>
+            <div id="dingtalk-sections" class="list"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/ui/assets/integrations.js"></script>
+  </body>
+</html>

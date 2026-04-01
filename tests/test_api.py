@@ -55,6 +55,7 @@ def test_workbench_summary_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert "order_count" in payload["data"]
+    assert "agent_run_count" in payload["data"]
 
 
 def test_rule_catalog_endpoint() -> None:
@@ -62,6 +63,7 @@ def test_rule_catalog_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert any(item["rule_code"] == "R002" for item in payload["data"])
+    assert any("subscribers" in item for item in payload["data"])
 
 
 def test_integrations_endpoint() -> None:
@@ -69,3 +71,51 @@ def test_integrations_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert len(payload["data"]) == 3
+    assert payload["data"][0]["mode"] == "mock-api"
+
+
+def test_integration_snapshot_endpoint() -> None:
+    response = client.get("/api/integrations/crm")
+    assert response.status_code == 200
+    payload = response.json()
+    assert any(item["section"] == "customers" for item in payload["data"])
+
+
+def test_demo_scenario_endpoint() -> None:
+    response = client.get("/api/demo/scenarios")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["data"][0]["code"]
+
+
+def test_platform_page_endpoint() -> None:
+    response = client.get("/platform")
+    assert response.status_code == 200
+    assert "订单驱动智能贸易操作系统" in response.text
+
+
+def test_frontend_orders_page_endpoint() -> None:
+    response = client.get("/ui/orders.html")
+    assert response.status_code == 200
+    assert "订单作战看板" in response.text
+
+
+def test_agent_catalog_endpoint() -> None:
+    response = client.get("/api/agents/catalog")
+    assert response.status_code == 200
+    payload = response.json()
+    assert any(item["agent_key"] == "finance_agent" for item in payload["data"])
+
+
+def test_order_progress_endpoint() -> None:
+    response = client.get("/api/orders/ord_001/progress")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["data"]["stages"]
+
+
+def test_demo_scenario_creates_agent_runs() -> None:
+    response = client.post("/api/demo/scenarios/doc_missing_ord_002/run")
+    assert response.status_code == 200
+    runs = client.get("/api/agent-runs").json()["data"]
+    assert any(item["agent_name"] in {"Customs / Documentation Agent", "Follow-up Agent"} for item in runs)

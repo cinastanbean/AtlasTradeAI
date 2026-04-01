@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from atlas_trade_ai.api.router import api_router
+
+WEB_DIR = Path(__file__).resolve().parent / "web"
+WEBAPP_DIR = Path(__file__).resolve().parent / "webapp"
 
 app = FastAPI(
     title="AtlasTradeAI",
@@ -11,6 +17,7 @@ app = FastAPI(
     description="Order-driven intelligent trade operating system skeleton",
 )
 app.include_router(api_router)
+app.mount("/ui", StaticFiles(directory=WEBAPP_DIR, html=True), name="ui")
 
 
 @app.get("/")
@@ -66,3 +73,18 @@ def demo() -> str:
       </body>
     </html>
     """
+
+
+@app.get("/platform")
+def platform() -> RedirectResponse:
+    return RedirectResponse(url="/ui/index.html")
+
+
+@app.get("/app")
+def frontend_app() -> RedirectResponse:
+    return RedirectResponse(url="/ui/index.html")
+
+
+@app.get("/platform-legacy")
+def legacy_platform() -> FileResponse:
+    return FileResponse(WEB_DIR / "platform.html")

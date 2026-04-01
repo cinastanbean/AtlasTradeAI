@@ -6,7 +6,7 @@
       "task_enabled": true,
       "exception_enabled": false,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["follow_up_agent"]
     },
     {
       "rule_code": "R002",
@@ -14,7 +14,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["follow_up_agent", "supply_chain_agent"]
     },
     {
       "rule_code": "R004",
@@ -22,7 +22,7 @@
       "task_enabled": true,
       "exception_enabled": false,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["logistics_agent"]
     },
     {
       "rule_code": "R006",
@@ -30,7 +30,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["customs_agent", "follow_up_agent"]
     },
     {
       "rule_code": "R008",
@@ -38,7 +38,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["logistics_agent", "follow_up_agent"]
     },
     {
       "rule_code": "R009",
@@ -46,7 +46,7 @@
       "task_enabled": true,
       "exception_enabled": false,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["finance_agent"]
     },
     {
       "rule_code": "R010",
@@ -54,7 +54,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscriber": "follow_up_agent"
+      "subscribers": ["finance_agent", "follow_up_agent"]
     }
   ]
 }

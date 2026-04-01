@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>订单看板 - AtlasTradeAI</title>
+    <link rel="stylesheet" href="/ui/assets/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">AtlasTradeAI</div>
+        <nav class="nav">
+          <a class="nav-link" href="/ui/index.html">总览</a>
+          <a class="nav-link active" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link" href="/ui/agents.html">Agent 运行</a>
+          <a class="nav-link" href="/ui/integrations.html">系统集成</a>
+        </nav>
+      </aside>
+      <main class="content">
+        <header class="page-header">
+          <div>
+            <h1>订单作战看板</h1>
+            <p>查看所有订单当前已经走到哪里，并进入单订单详情查看完整时间线。</p>
+          </div>
+          <div class="toolbar">
+            <button id="refresh-orders" class="primary">刷新订单</button>
+          </div>
+        </header>
+
+        <section id="order-kanban" class="kanban"></section>
+      </main>
+    </div>
+    <script type="module" src="/ui/assets/orders.js"></script>
+  </body>
+</html>

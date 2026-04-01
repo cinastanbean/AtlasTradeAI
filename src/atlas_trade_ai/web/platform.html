@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AtlasTradeAI Demo Platform</title>
+    <style>
+      :root { --bg:#f4f1ea; --card:#fffdf9; --line:#dfd8ca; --ink:#1f1b16; --muted:#6e665d; --brand:#0e6a52; --warn:#c55a11; --danger:#b42318; }
+      * { box-sizing:border-box; } body { margin:0; font-family:"Helvetica Neue","PingFang SC",sans-serif; color:var(--ink); background:radial-gradient(circle at top right,#e5efe7 0%,transparent 30%),linear-gradient(180deg,#f8f5ef 0%,var(--bg) 100%); }
+      .shell { max-width:1440px; margin:0 auto; padding:24px; } .hero { display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:24px; }
+      .hero h1 { margin:0 0 8px; font-size:34px; } .hero p { margin:0; color:var(--muted); max-width:760px; line-height:1.6; }
+      .grid { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; } .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:0 8px 24px rgba(33,24,13,.05); }
+      .span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}
+      .kpi { font-size:32px; font-weight:700; margin-top:8px; } .label { color:var(--muted); font-size:13px; } h3 { margin:0 0 12px; }
+      .list { display:grid; gap:10px; } .item { border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff; } .item .meta { color:var(--muted); font-size:12px; margin-top:6px; }
+      .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; margin-left:8px; background:#eaf4f0; color:var(--brand); } .badge.high { background:#fdeee8; color:var(--warn);} .badge.p1 { background:#fee4e2; color:var(--danger);}
+      .controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; } button { border:none; border-radius:10px; padding:10px 14px; background:var(--brand); color:white; cursor:pointer; font-weight:600; }
+      button.alt { background:#e8ece9; color:var(--ink); } select { width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:white; }
+      pre { background:#1e1e1e; color:#f7f7f7; padding:14px; border-radius:12px; overflow:auto; font-size:12px; min-height:220px; } .stack { display:grid; gap:12px; }
+      .progress { display:grid; grid-template-columns:repeat(8, minmax(100px,1fr)); gap:10px; }
+      .stage { border:1px solid var(--line); border-radius:12px; padding:12px; background:white; min-height:86px; }
+      .stage.completed { background:#edf7f1; border-color:#cfe5d8; }
+      .stage.current { background:#fff3e9; border-color:#efc29b; }
+      .stage .small { color:var(--muted); font-size:11px; margin-bottom:6px; }
+      @media (max-width:980px){ .span-3,.span-4,.span-5,.span-6,.span-7,.span-8,.span-12{grid-column:span 12}.hero{flex-direction:column;align-items:start;} .progress{grid-template-columns:repeat(2, minmax(120px,1fr));} }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div>
+          <h1>AtlasTradeAI Demo Platform</h1>
+          <p>订单驱动的智能贸易操作系统演示平台。你可以查看工作台、订单作战视图、Agent 运行记录、规则与集成状态，并手工触发业务场景来观察系统如何自动流转。</p>
+        </div>
+        <div class="controls"><button class="alt" onclick="loadAll()">刷新全局视图</button></div>
+      </section>
+      <section class="grid">
+        <div class="card span-3"><div class="label">客户总数</div><div class="kpi" id="kpi-customers">-</div></div>
+        <div class="card span-3"><div class="label">订单总数</div><div class="kpi" id="kpi-orders">-</div></div>
+        <div class="card span-3"><div class="label">待处理任务</div><div class="kpi" id="kpi-tasks">-</div></div>
+        <div class="card span-3"><div class="label">Agent 运行次数</div><div class="kpi" id="kpi-agent-runs">-</div></div>
+        <div class="card span-4"><h3>系统适配层</h3><div id="integrations" class="list"></div></div>
+        <div class="card span-4"><h3>场景模拟器</h3><div class="stack"><select id="scenario-select"></select><div class="controls"><button onclick="runScenario()">运行场景</button><button class="alt" onclick="loadScenarios()">刷新场景</button></div><pre id="scenario-result">等待场景运行...</pre></div></div>
+        <div class="card span-4"><h3>规则配置概览</h3><div id="rules" class="list"></div></div>
+        <div class="card span-8"><h3>订单作战视图</h3><div class="controls" id="order-buttons"></div><div id="order-progress" class="progress"></div><pre id="order-detail">选择订单后查看详情...</pre></div>
+        <div class="card span-5"><h3>高风险订单</h3><div id="high-risk-orders" class="list"></div></div>
+        <div class="card span-6"><h3>最新任务与异常</h3><div id="work-items" class="list"></div></div>
+        <div class="card span-6"><h3>Agent 运行日志</h3><div id="agent-runs" class="list"></div></div>
+        <div class="card span-12"><h3>Agent 目录</h3><div id="agent-catalog" class="list"></div></div>
+      </section>
+    </div>
+    <script>
+      async function fetchJson(url, options) { const response = await fetch(url, options); return await response.json(); }
+      function badgeClass(value) { if (!value) return ''; const lower = String(value).toLowerCase(); if (lower.includes('high') || lower.includes('medium')) return 'high'; if (lower.includes('p1')) return 'p1'; return ''; }
+      function renderList(id, items, renderItem) { const el = document.getElementById(id); el.innerHTML = items.map(renderItem).join('') || '<div class="item">暂无数据</div>'; }
+      async function loadWorkbench() {
+        const {data} = await fetchJson('/api/workbench/summary');
+        document.getElementById('kpi-customers').textContent = data.customer_count;
+        document.getElementById('kpi-orders').textContent = data.order_count;
+        document.getElementById('kpi-tasks').textContent = data.pending_task_count;
+        document.getElementById('kpi-agent-runs').textContent = data.agent_run_count;
+        renderList('high-risk-orders', data.high_risk_orders, item => `<div class="item"><strong>${item.order_no || item.order_id}</strong><span class="badge ${badgeClass(item.risk_level)}">${item.risk_level || 'unknown'}</span><div class="meta">${item.current_status || ''}</div></div>`);
+        const mixed = [...data.latest_tasks.map(item => ({type:'task', item})), ...data.latest_exceptions.map(item => ({type:'exception', item}))].slice(0, 8);
+        renderList('work-items', mixed, row => row.type === 'task'
+          ? `<div class="item"><strong>任务：${row.item.task_title}</strong><div class="meta">订单 ${row.item.related_order_id || '-'} / 优先级 ${row.item.priority}</div></div>`
+          : `<div class="item"><strong>异常：${row.item.exception_type}</strong><span class="badge p1">${row.item.exception_level}</span><div class="meta">订单 ${row.item.related_order_id || '-'}</div></div>`);
+      }
+      async function loadIntegrations() {
+        const {data} = await fetchJson('/api/integrations');
+        renderList('integrations', data, item => `<div class="item"><strong>${item.name}</strong><span class="badge">${item.mode}</span><div class="meta">${item.description}</div></div>`);
+      }
+      async function loadRules() {
+        const {data} = await fetchJson('/api/rules/workflow');
+        renderList('rules', data.slice(0, 6), item => `<div class="item"><strong>${item.rule_code}</strong><span class="badge">${item.event_type}</span><div class="meta">subscriber: ${item.subscriber}</div></div>`);
+      }
+      async function loadOrders() {
+        const {data} = await fetchJson('/api/orders');
+        const box = document.getElementById('order-buttons');
+        box.innerHTML = data.items.map(item => `<button class="alt" onclick="loadOrderDetail('${item.order_id}')">${item.order_no}</button>`).join('');
+        if (data.items.length) await loadOrderDetail(data.items[0].order_id);
+      }
+      async function loadOrderDetail(orderId) {
+        const detail = await fetchJson(`/api/dashboard/orders/${orderId}`);
+        const progress = await fetchJson(`/api/orders/${orderId}/progress`);
+        document.getElementById('order-detail').textContent = JSON.stringify(detail.data, null, 2);
+        renderList('order-progress', progress.data.stages, item => `<div class="stage ${item.state}"><div class="small">${item.layer}</div><strong>${item.status}</strong><div class="meta">${item.state}</div></div>`);
+      }
+      async function loadAgentRuns() { const {data} = await fetchJson('/api/agent-runs'); renderList('agent-runs', data.slice(0, 6), item => `<div class="item"><strong>${item.agent_name}</strong><span class="badge">${item.trigger_event_type}</span><div class="meta">订单 ${item.order_id || '-'} / run ${item.run_id}</div></div>`); }
+      async function loadAgentCatalog() {
+        const {data} = await fetchJson('/api/agents/catalog');
+        renderList('agent-catalog', data, item => `<div class="item"><strong>${item.name}</strong><span class="badge">${item.layer}</span><div class="meta">${item.description}</div><div class="meta">订阅: ${item.subscribed_events.join(', ')}</div></div>`);
+      }
+      async function loadScenarios() { const {data} = await fetchJson('/api/demo/scenarios'); document.getElementById('scenario-select').innerHTML = data.map(item => `<option value="${item.code}">${item.name}</option>`).join(''); }
+      async function runScenario() { const code = document.getElementById('scenario-select').value; const payload = await fetchJson(`/api/demo/scenarios/${code}/run`, {method:'POST'}); document.getElementById('scenario-result').textContent = JSON.stringify(payload.data, null, 2); await loadAll(); }
+      async function loadAll() { await Promise.all([loadWorkbench(), loadIntegrations(), loadRules(), loadOrders(), loadAgentRuns(), loadScenarios(), loadAgentCatalog()]); }
+      loadAll();
+    </script>
+  </body>
+</html>
