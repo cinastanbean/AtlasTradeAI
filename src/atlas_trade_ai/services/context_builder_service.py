@@ -26,6 +26,7 @@ class ContextBuilderService:
                 "biz_object_type": payload["biz_object_type"],
                 "biz_object_id": payload["biz_object_id"],
             },
+            "event_payload": payload.get("payload", {}),
             "order_context": {
                 "order_id": order["order_id"],
                 "order_no": order["order_no"],

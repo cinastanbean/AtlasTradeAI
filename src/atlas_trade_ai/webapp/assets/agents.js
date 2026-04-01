@@ -9,6 +9,8 @@ async function renderAgents() {
         <h3>${item.name}</h3>
         <p>Agent Key: ${item.agent_key}</p>
         <p>层级: ${item.layer}</p>
+        <p>运行模式: ${item.execution_mode || "-"}</p>
+        <p>智能类型: ${item.intelligence_type || "-"}</p>
         <p>职责: ${item.description || "待补充"}</p>
       </div>
     `
@@ -23,6 +25,7 @@ async function renderAgents() {
         <p>订单: ${item.order_id || "-"}</p>
         <p>事件: ${item.trigger_event_type}</p>
         <p>摘要: ${(item.output_result && item.output_result.summary) || "-"}</p>
+        <p>引擎: ${(item.output_result && item.output_result.engine && item.output_result.engine.provider) || "-"}</p>
       </div>
     `
     )

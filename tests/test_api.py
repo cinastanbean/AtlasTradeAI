@@ -105,6 +105,7 @@ def test_agent_catalog_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert any(item["agent_key"] == "finance_agent" for item in payload["data"])
+    assert any(item["execution_mode"] == "hybrid" for item in payload["data"])
 
 
 def test_order_progress_endpoint() -> None:
@@ -119,3 +120,61 @@ def test_demo_scenario_creates_agent_runs() -> None:
     assert response.status_code == 200
     runs = client.get("/api/agent-runs").json()["data"]
     assert any(item["agent_name"] in {"Customs / Documentation Agent", "Follow-up Agent"} for item in runs)
+
+
+def test_sales_and_crm_scenario_creates_two_agent_runs() -> None:
+    response = client.post("/api/demo/scenarios/quotation_accepted_ord_005/run")
+    assert response.status_code == 200
+    runs = client.get("/api/agent-runs").json()["data"]
+    names = {item["agent_name"] for item in runs}
+    assert "Sales Agent" in names
+    assert "CRM Agent" in names
+
+
+def test_generic_agent_run_endpoint() -> None:
+    response = client.post(
+        "/api/agents/finance_agent/run",
+        json={
+            "trigger_event": {
+                "event_id": "evt_fin_001",
+                "event_type": "payment.overdue",
+                "event_time": "2026-04-01T12:00:00+08:00",
+                "source_system": "erp",
+                "biz_object_type": "order",
+                "biz_object_id": "ord_004",
+            },
+            "order_context": {
+                "order_id": "ord_004",
+                "order_no": "SO-2026-0004",
+                "current_status": "待回款",
+                "sub_status": "客户已签收",
+                "risk_level": "high",
+                "planned_delivery_date": "2026-03-20",
+                "payment_status": "逾期",
+            },
+            "customer_context": {
+                "customer_id": "cus_004",
+                "customer_name": "华南电商客户D",
+                "customer_level": "成长客户",
+                "business_type": "内销",
+                "owner_id": "user_sales_01",
+            },
+            "fulfillment_context": {
+                "milestones": [],
+                "latest_logistics_status": "delivered",
+                "document_status": "not_required",
+                "customs_status": None,
+                "exceptions": [],
+            },
+            "payment_context": {
+                "receivable_amount": 56000.0,
+                "received_amount": 0.0,
+                "due_date": "2026-03-28",
+                "overdue_days": 4,
+            },
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["data"]["risk_assessment"]["risk_type"] == "finance_risk"
+    assert payload["data"]["engine"]["mode"] in {"rules", "hybrid"}

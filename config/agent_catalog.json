@@ -5,56 +5,72 @@
       "name": "Sales Agent",
       "layer": "客户经营层",
       "description": "负责客户开发、报价、成交与规格协商",
-      "subscribed_events": ["quotation.accepted", "order.confirm_request"]
+      "subscribed_events": ["quotation.accepted", "order.confirm_request"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "商机推进 + 客户沟通建议"
     },
     {
       "agent_key": "crm_agent",
       "name": "CRM Agent",
       "layer": "客户经营层",
       "description": "负责客户沉淀、客户分层、画像分析和跟进提醒",
-      "subscribed_events": ["customer.created", "customer.updated", "after_sales.closed"]
+      "subscribed_events": ["customer.created", "customer.updated", "after_sales.closed", "quotation.accepted"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "客户画像 + 分层提醒"
     },
     {
       "agent_key": "follow_up_agent",
       "name": "Follow-up Agent",
       "layer": "履约推进层",
       "description": "负责跟单推进、异常识别、任务生成和流程催办",
-      "subscribed_events": ["order.confirmed", "production.milestone_delayed", "document.missing", "logistics.delayed", "payment.overdue"]
+      "subscribed_events": ["order.confirmed", "production.milestone_delayed", "document.missing", "logistics.delayed", "payment.overdue"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "履约风险识别 + 任务编排"
     },
     {
       "agent_key": "supply_chain_agent",
       "name": "Supply Chain Agent",
       "layer": "供应链执行层",
       "description": "负责工厂协同、排产、采购和供应链风险管理",
-      "subscribed_events": ["followup.execution_started", "production.milestone_delayed", "shipment.ready"]
+      "subscribed_events": ["followup.execution_started", "production.milestone_delayed", "shipment.ready"],
+      "execution_mode": "rules",
+      "intelligence_type": "排产建议 + 产能风险识别"
     },
     {
       "agent_key": "logistics_agent",
       "name": "Logistics Agent",
       "layer": "交付与合规层",
       "description": "负责发货安排、物流跟踪、仓配协调和运输时效",
-      "subscribed_events": ["shipment.ready", "shipment.dispatched", "logistics.delayed"]
+      "subscribed_events": ["shipment.ready", "shipment.dispatched", "logistics.delayed"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "交付时效判断 + 客户同步建议"
     },
     {
       "agent_key": "customs_agent",
       "name": "Customs / Documentation Agent",
       "layer": "交付与合规层",
       "description": "负责单证完整性、报关资料、清关和合规校验",
-      "subscribed_events": ["document.missing", "customs.rejected"]
+      "subscribed_events": ["document.missing", "customs.rejected"],
+      "execution_mode": "rules",
+      "intelligence_type": "单证校验 + 合规阻塞识别"
     },
     {
       "agent_key": "finance_agent",
       "name": "Finance Agent",
       "layer": "资金结算层",
       "description": "负责应收应付、回款跟踪、利润核算和财务风险识别",
-      "subscribed_events": ["payment.due_soon", "payment.overdue", "payment.completed"]
+      "subscribed_events": ["payment.due_soon", "payment.overdue", "payment.completed"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "回款风险识别 + 催收建议"
     },
     {
       "agent_key": "customer_service_agent",
       "name": "Customer Service Agent",
       "layer": "售后服务层",
       "description": "负责售后支持、投诉处理、客户维护和问题闭环",
-      "subscribed_events": ["after_sales.created", "after_sales.complaint_created", "after_sales.closed"]
+      "subscribed_events": ["after_sales.created", "after_sales.complaint_created", "after_sales.closed"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "投诉分流 + 服务闭环建议"
     }
   ]
 }

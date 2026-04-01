@@ -38,6 +38,8 @@
 - [跟单员 Agent 输入输出协议](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/03-agent-architecture/follow-up-agent-io-protocol.md)
 - [跟单员 Agent 场景用例集与提示词框架](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/03-agent-architecture/follow-up-agent-use-cases-and-prompt-framework.md)
 - [跟单员 Agent 原型实现说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/03-agent-architecture/follow-up-agent-prototype-implementation.md)
+- [智能能力分析与 Agent 演进设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/03-agent-architecture/intelligence-capabilities-and-agent-evolution.md)
+- [Agent 实现现状与下一步清单](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/03-agent-architecture/agent-implementation-status-and-next-steps.md)
 
 ## 5. 实施路线
 

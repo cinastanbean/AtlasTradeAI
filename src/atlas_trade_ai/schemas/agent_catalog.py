@@ -9,3 +9,5 @@ class AgentCatalogRead(BaseModel):
     layer: str
     description: str
     subscribed_events: list[str]
+    execution_mode: str | None = None
+    intelligence_type: str | None = None

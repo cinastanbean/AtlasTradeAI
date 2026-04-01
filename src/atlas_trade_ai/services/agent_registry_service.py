@@ -3,7 +3,7 @@ from __future__ import annotations
 from atlas_trade_ai.core.config_loader import JsonConfigLoader
 from atlas_trade_ai.services.agent_run_service import AgentRunService
 from atlas_trade_ai.services.agent_service import FollowUpAgentService
-from atlas_trade_ai.services.generic_role_agent_service import GenericRoleAgentService
+from atlas_trade_ai.services.intelligent_role_agent_service import IntelligentRoleAgentService
 
 
 class AgentRegistryService:
@@ -21,10 +21,12 @@ class AgentRegistryService:
             key = item["agent_key"]
             if key == "follow_up_agent":
                 continue
-            services[key] = GenericRoleAgentService(
+            services[key] = IntelligentRoleAgentService(
                 agent_key=key,
                 agent_name=item["name"],
                 agent_run_service=self.agent_run_service,
+                execution_mode=item.get("execution_mode", "hybrid"),
+                intelligence_type=item.get("intelligence_type"),
             )
         return services
 

@@ -1,6 +1,26 @@
 {
   "scenarios": [
     {
+      "code": "quotation_accepted_ord_005",
+      "name": "报价接受：新订单推进",
+      "description": "模拟客户接受报价，触发 Sales Agent 和 CRM Agent 进入成交与沉淀动作。",
+      "event": {
+        "event_type": "quotation.accepted",
+        "event_time": "2026-04-01T09:20:00+08:00",
+        "source_system": "fxiaoke",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_005",
+        "order_id": "ord_005",
+        "customer_id": "cus_002",
+        "priority": "P3",
+        "payload": {
+          "quotation_id": "fx_q_001",
+          "accepted_amount": 32800.0,
+          "currency": "EUR"
+        }
+      }
+    },
+    {
       "code": "prod_delay_ord_001",
       "name": "生产延期：内销订单",
       "description": "模拟内销订单生产里程碑延期，触发跟单员 Agent。",
@@ -64,6 +84,26 @@
           "received_amount": 0.0,
           "due_date": "2026-03-25",
           "overdue_days": 7
+        }
+      }
+    },
+    {
+      "code": "after_sales_complaint_ord_001",
+      "name": "售后投诉：内销订单",
+      "description": "模拟客户投诉，触发 Customer Service Agent 与 CRM Agent 形成服务闭环。",
+      "event": {
+        "event_type": "after_sales.complaint_created",
+        "event_time": "2026-04-01T16:30:00+08:00",
+        "source_system": "atlas_trade_ai",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_001",
+        "order_id": "ord_001",
+        "customer_id": "cus_001",
+        "priority": "P1",
+        "payload": {
+          "complaint_type": "包装破损",
+          "severity": "high",
+          "customer_message": "客户反馈到货后外箱破损，要求解释和补偿方案。"
         }
       }
     }

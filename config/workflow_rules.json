@@ -1,6 +1,14 @@
 {
   "rules": [
     {
+      "rule_code": "R000",
+      "event_type": "quotation.accepted",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscribers": ["sales_agent", "crm_agent"]
+    },
+    {
       "rule_code": "R001",
       "event_type": "order.confirmed",
       "task_enabled": true,
@@ -33,6 +41,14 @@
       "subscribers": ["customs_agent", "follow_up_agent"]
     },
     {
+      "rule_code": "R007",
+      "event_type": "customs.rejected",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscribers": ["customs_agent", "follow_up_agent", "logistics_agent"]
+    },
+    {
       "rule_code": "R008",
       "event_type": "logistics.delayed",
       "task_enabled": true,
@@ -55,6 +71,14 @@
       "exception_enabled": true,
       "notification_enabled": true,
       "subscribers": ["finance_agent", "follow_up_agent"]
+    },
+    {
+      "rule_code": "R011",
+      "event_type": "after_sales.complaint_created",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscribers": ["customer_service_agent", "crm_agent"]
     }
   ]
 }
