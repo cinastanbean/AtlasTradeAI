@@ -16,6 +16,7 @@
 
 - [系统蓝图与模块衔接说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/system-blueprint.md)
 - [订单状态机设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/order-state-machine-design.md)
+- [Order Orchestrator 设计说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/order-orchestrator-design.md)
 - [统一事件模型设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/unified-event-model-design.md)
 - [系统集成与数据同步架构设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/system-integration-and-data-sync-design.md)
 - [异常中心设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/exception-center-design.md)

@@ -13,6 +13,14 @@ async function renderDetail() {
     getOrderProgress(orderId),
   ]);
   document.querySelector("#detail-title").textContent = `${dashboard.order.order_no} 订单详情`;
+  const orchestration = dashboard.orchestration || {};
+  document.querySelector("#orchestration-summary").innerHTML = `
+    <h4>Order Orchestrator</h4>
+    <p>当前层级: ${progress.current_layer || "-"}</p>
+    <p>下一责任 Agent: ${progress.next_owner_agent || "-"}</p>
+    <p>阻塞状态: ${progress.blocked ? "是" : "否"}</p>
+    <p>决策摘要: ${orchestration.decision_summary || "暂无最近编排结果"}</p>
+  `;
   document.querySelector("#order-progress").innerHTML = progress.stages
     .map(
       (stage) => `

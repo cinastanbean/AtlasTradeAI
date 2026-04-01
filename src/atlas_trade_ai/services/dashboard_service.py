@@ -18,6 +18,12 @@ class DashboardService:
         agent_runs = [
             item for item in self.store.list_agent_runs() if item.get("order_id") == order_id
         ]
+        latest_orchestration = order.get("last_orchestration")
+        if latest_orchestration is None:
+            for item in agent_runs:
+                if item.get("agent_name") == "Order Orchestrator":
+                    latest_orchestration = item.get("output_result")
+                    break
         return {
             "order": order,
             "customer": customer,
@@ -25,4 +31,5 @@ class DashboardService:
             "exceptions": exceptions,
             "events": sorted(events, key=lambda item: item.get("event_time", ""), reverse=True),
             "agent_runs": agent_runs,
+            "orchestration": latest_orchestration,
         }

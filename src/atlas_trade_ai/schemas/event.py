@@ -32,6 +32,7 @@ class EventWriteResponse(BaseModel):
     event_id: str
     accepted: bool
     matched_rule: str | None = None
+    orchestration: dict[str, Any] | None = None
     generated_task_ids: list[str] = []
     generated_exception_ids: list[str] = []
     notification_ids: list[str] = []

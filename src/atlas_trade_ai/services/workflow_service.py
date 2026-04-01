@@ -4,6 +4,7 @@ from atlas_trade_ai.services.agent_registry_service import AgentRegistryService
 from atlas_trade_ai.services.context_builder_service import ContextBuilderService
 from atlas_trade_ai.services.exception_service import ExceptionService
 from atlas_trade_ai.services.notification_service import NotificationService
+from atlas_trade_ai.services.order_orchestrator_service import OrderOrchestratorService
 from atlas_trade_ai.services.rule_registry_service import RuleRegistryService
 from atlas_trade_ai.services.task_service import TaskService
 
@@ -13,6 +14,7 @@ class WorkflowService:
         self,
         rule_registry: RuleRegistryService,
         agent_registry: AgentRegistryService,
+        order_orchestrator: OrderOrchestratorService,
         context_builder: ContextBuilderService,
         task_service: TaskService,
         exception_service: ExceptionService,
@@ -20,6 +22,7 @@ class WorkflowService:
     ) -> None:
         self.rule_registry = rule_registry
         self.agent_registry = agent_registry
+        self.order_orchestrator = order_orchestrator
         self.context_builder = context_builder
         self.task_service = task_service
         self.exception_service = exception_service
@@ -30,11 +33,16 @@ class WorkflowService:
         if not rule or not payload.get("order_id"):
             return {
                 "matched_rule": None,
+                "orchestration": None,
                 "generated_task_ids": [],
                 "generated_exception_ids": [],
                 "notification_ids": [],
             }
 
+        orchestration = self.order_orchestrator.orchestrate(
+            payload,
+            rule.get("subscribers", []),
+        )
         context_payload = self.context_builder.build_follow_up_context(payload)
 
         generated_task_ids: list[str] = []
@@ -92,6 +100,7 @@ class WorkflowService:
 
         return {
             "matched_rule": rule["rule_code"],
+            "orchestration": orchestration,
             "generated_task_ids": generated_task_ids,
             "generated_exception_ids": generated_exception_ids,
             "notification_ids": notification_ids,

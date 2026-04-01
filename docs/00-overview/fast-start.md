@@ -51,9 +51,10 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 5. 查看 `/api/agents/catalog`
 6. 查看 `/api/orders`
 7. 查看 `/api/orders/{id}/progress`
-8. 查看 `/api/demo/scenarios`
-9. 运行一个 Demo 场景
-10. 再查看 `/api/tasks`、`/api/exceptions`、`/api/agent-runs`
+8. 查看 `/api/orders/{id}/orchestration`
+9. 查看 `/api/demo/scenarios`
+10. 运行一个 Demo 场景
+11. 再查看 `/api/tasks`、`/api/exceptions`、`/api/agent-runs`
 
 ## 5. 关键接口
 
@@ -68,6 +69,8 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 - `GET /api/customers`
 - `GET /api/orders`
 - `GET /api/orders/{id}`
+- `GET /api/orders/{id}/progress`
+- `GET /api/orders/{id}/orchestration`
 
 ### 事件驱动
 

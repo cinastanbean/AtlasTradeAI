@@ -46,6 +46,8 @@ def test_event_pipeline_generates_task_and_exception() -> None:
     payload = response.json()
     assert payload["data"]["accepted"] is True
     assert payload["data"]["matched_rule"] == "R002"
+    assert payload["data"]["orchestration"]["applied"] is True
+    assert payload["data"]["orchestration"]["next_owner_agent"] == "supply_chain_agent"
     assert payload["data"]["generated_task_ids"]
     assert payload["data"]["generated_exception_ids"]
 
@@ -113,6 +115,16 @@ def test_order_progress_endpoint() -> None:
     assert response.status_code == 200
     payload = response.json()
     assert payload["data"]["stages"]
+    assert "current_layer" in payload["data"]
+
+
+def test_order_orchestration_endpoint() -> None:
+    client.post("/api/demo/scenarios/payment_overdue_ord_002/run")
+    response = client.get("/api/orders/ord_002/orchestration")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["data"]["next_owner_agent"] == "finance_agent"
+    assert payload["data"]["blocked"] is True
 
 
 def test_demo_scenario_creates_agent_runs() -> None:

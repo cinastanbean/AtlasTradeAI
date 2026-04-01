@@ -15,6 +15,7 @@ from atlas_trade_ai.api.routes import (
     notifications,
     orders,
     order_progress,
+    order_orchestrator,
     overview,
     rules,
     tasks,
@@ -27,6 +28,7 @@ api_router.include_router(overview.router)
 api_router.include_router(customers.router)
 api_router.include_router(orders.router)
 api_router.include_router(order_progress.router)
+api_router.include_router(order_orchestrator.router)
 api_router.include_router(tasks.router)
 api_router.include_router(exceptions.router)
 api_router.include_router(events.router)

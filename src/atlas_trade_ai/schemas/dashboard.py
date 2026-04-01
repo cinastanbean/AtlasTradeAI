@@ -12,3 +12,4 @@ class OrderDashboardRead(BaseModel):
     exceptions: list[dict[str, Any]]
     events: list[dict[str, Any]]
     agent_runs: list[dict[str, Any]]
+    orchestration: dict[str, Any] | None = None

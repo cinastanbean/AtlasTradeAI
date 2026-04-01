@@ -28,6 +28,7 @@ class EventService:
             "event_id": event_id,
             "accepted": True,
             "matched_rule": workflow_result["matched_rule"],
+            "orchestration": workflow_result.get("orchestration"),
             "generated_task_ids": workflow_result["generated_task_ids"],
             "generated_exception_ids": workflow_result["generated_exception_ids"],
             "notification_ids": workflow_result["notification_ids"],

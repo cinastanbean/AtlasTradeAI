@@ -16,6 +16,7 @@ from atlas_trade_ai.services.exception_service import ExceptionService
 from atlas_trade_ai.services.integration_service import IntegrationService
 from atlas_trade_ai.services.notification_service import NotificationService
 from atlas_trade_ai.services.order_service import OrderService
+from atlas_trade_ai.services.order_orchestrator_service import OrderOrchestratorService
 from atlas_trade_ai.services.order_progress_service import OrderProgressService
 from atlas_trade_ai.services.overview_service import OverviewService
 from atlas_trade_ai.services.rule_registry_service import RuleRegistryService
@@ -33,6 +34,12 @@ class AppContainer:
         self.rule_registry_service = RuleRegistryService(self.config_loader)
         self.customer_service = CustomerService(self.store)
         self.order_service = OrderService(self.store)
+        self.order_orchestrator_service = OrderOrchestratorService(
+            self.store,
+            self.order_service,
+            self.agent_run_service,
+            self.config_loader,
+        )
         self.order_progress_service = OrderProgressService(self.store)
         self.task_service = TaskService(self.store)
         self.exception_service = ExceptionService(self.store)
@@ -42,6 +49,7 @@ class AppContainer:
         self.workflow_service = WorkflowService(
             rule_registry=self.rule_registry_service,
             agent_registry=self.agent_registry_service,
+            order_orchestrator=self.order_orchestrator_service,
             context_builder=self.context_builder_service,
             task_service=self.task_service,
             exception_service=self.exception_service,
