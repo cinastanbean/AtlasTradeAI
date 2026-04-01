@@ -1,5 +1,6 @@
 import {
   getAgentRuns,
+  getEscalations,
   getScenarios,
   getWorkbench,
   runScenario,
@@ -11,6 +12,7 @@ function renderKpis(summary) {
     ["订单数", summary.order_count],
     ["待处理任务", summary.pending_task_count],
     ["Agent 运行次数", summary.agent_run_count],
+    ["升级订单数", summary.escalated_order_count],
   ];
   document.querySelector("#kpis").innerHTML = kpis
     .map(
@@ -52,10 +54,11 @@ function renderList(selector, items, renderItem) {
 }
 
 async function loadDashboard() {
-  const [summary, runs, scenarios] = await Promise.all([
+  const [summary, runs, scenarios, escalations] = await Promise.all([
     getWorkbench(),
     getAgentRuns(),
     getScenarios(),
+    getEscalations(),
   ]);
   renderKpis(summary);
   renderProcessMap();
@@ -76,6 +79,18 @@ async function loadDashboard() {
       <div class="list-card">
         <h3>${item.agent_name}</h3>
         <p>订单 ${item.order_id || "-"} / 事件 ${item.trigger_event_type}</p>
+      </div>
+    `
+  );
+  renderList(
+    "#escalation-orders",
+    escalations.slice(0, 6),
+    (item) => `
+      <div class="list-card">
+        <h3>${item.order_no}</h3>
+        <p>${item.current_status || "-"} / 升级级别 ${item.escalation_level || "-"}</p>
+        <p>下一责任 Agent: ${item.next_owner_agent || "-"}</p>
+        <p>升级对象: ${(item.escalation_targets || []).map((t) => t.user_name).join(" / ") || "-"}</p>
       </div>
     `
   );

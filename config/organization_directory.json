@@ -1,0 +1,24 @@
+{
+  "users": [
+    {"user_id": "user_sales_01", "name": "王敏", "role": "销售负责人"},
+    {"user_id": "user_sales_02", "name": "Linda", "role": "外贸销售"},
+    {"user_id": "user_sales_03", "name": "Aaron", "role": "渠道销售"},
+    {"user_id": "user_finance_01", "name": "赵倩", "role": "财务经理"},
+    {"user_id": "user_finance_02", "name": "李媛", "role": "应收会计"},
+    {"user_id": "user_supply_01", "name": "周凯", "role": "供应链经理"},
+    {"user_id": "user_logistics_01", "name": "顾晨", "role": "物流主管"},
+    {"user_id": "user_customs_01", "name": "何倩", "role": "单证主管"},
+    {"user_id": "user_service_01", "name": "陈露", "role": "客服主管"},
+    {"user_id": "user_ops_01", "name": "郑航", "role": "运营总监"}
+  ],
+  "agent_owners": {
+    "follow_up_agent": ["user_sales_01"],
+    "finance_agent": ["user_finance_01", "user_finance_02"],
+    "supply_chain_agent": ["user_supply_01"],
+    "logistics_agent": ["user_logistics_01"],
+    "customs_agent": ["user_customs_01"],
+    "customer_service_agent": ["user_service_01"],
+    "order_orchestrator": ["user_ops_01"]
+  },
+  "critical_watchers": ["user_ops_01"]
+}

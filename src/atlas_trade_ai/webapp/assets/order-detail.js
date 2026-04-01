@@ -22,6 +22,8 @@ async function renderDetail() {
     <p>SLA: ${progress.sla_hours ? `${progress.sla_hours} 小时` : "-"}</p>
     <p>升级级别: ${(progress.escalation && progress.escalation.level) || "none"}</p>
     <p>升级对象: ${(progress.escalation && progress.escalation.targets && progress.escalation.targets.join(" / ")) || "-"}</p>
+    <p>通知到人: ${(progress.escalation && progress.escalation.resolved_targets && progress.escalation.resolved_targets.map((item) => item.user_name).join(" / ")) || "-"}</p>
+    <p>复合风险: ${(progress.escalation && progress.escalation.composite_signals && progress.escalation.composite_signals.join(" / ")) || "-"}</p>
     <p>决策摘要: ${orchestration.decision_summary || "暂无最近编排结果"}</p>
   `;
   document.querySelector("#order-progress").innerHTML = progress.stages

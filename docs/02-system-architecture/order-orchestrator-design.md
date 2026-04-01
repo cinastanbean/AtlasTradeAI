@@ -99,8 +99,29 @@ flowchart LR
 - `escalation.required`
 - `escalation.reasons`
 - `escalation.targets`
+- `escalation.resolved_targets`
+- `escalation.composite_signals`
 
-### 6.3 SLA 提示
+### 6.3 升级对象解析
+
+当前 `Order Orchestrator` 会根据组织目录解析升级对象：
+
+- 将 Agent 级目标转换为具体用户
+- 自动补充销售 owner
+- 在 critical 情况下自动带上运营总监或中枢观察者
+
+因此升级结果已经不只是“应该通知 Finance Agent”，而是会进一步变成具体的人和角色。
+
+### 6.4 复合风险判断
+
+当前已经支持部分多事件组合判断，例如：
+
+- `production.milestone_delayed` + `document.missing`
+- `logistics.delayed` + `payment.overdue`
+
+这种情况下会产生 `composite_signals`，并直接进入更高的升级等级。
+
+### 6.5 SLA 提示
 
 每类编排规则当前都可配置：
 
@@ -131,6 +152,8 @@ flowchart LR
 - 会记录一条 `Order Orchestrator` 运行日志
 - 会把最新编排结果回写到订单对象中
 - 会在订单详情页和进度页中展示出来
+- 会在工作台升级列表中聚合展示
+- 会自动产生升级通知
 
 ## 8. 后续建议
 

@@ -18,6 +18,7 @@ from atlas_trade_ai.services.notification_service import NotificationService
 from atlas_trade_ai.services.order_service import OrderService
 from atlas_trade_ai.services.order_orchestrator_service import OrderOrchestratorService
 from atlas_trade_ai.services.order_progress_service import OrderProgressService
+from atlas_trade_ai.services.orchestration_monitor_service import OrchestrationMonitorService
 from atlas_trade_ai.services.overview_service import OverviewService
 from atlas_trade_ai.services.rule_registry_service import RuleRegistryService
 from atlas_trade_ai.services.task_service import TaskService
@@ -41,6 +42,7 @@ class AppContainer:
             self.config_loader,
         )
         self.order_progress_service = OrderProgressService(self.store)
+        self.orchestration_monitor_service = OrchestrationMonitorService(self.store)
         self.task_service = TaskService(self.store)
         self.exception_service = ExceptionService(self.store)
         self.notification_service = NotificationService(self.store)

@@ -23,7 +23,9 @@ class WorkbenchSummary(BaseModel):
     open_exception_count: int
     event_count: int
     agent_run_count: int
+    escalated_order_count: int
     high_risk_orders: list[WorkbenchItem]
+    escalated_orders: list[WorkbenchItem]
     latest_tasks: list[dict]
     latest_exceptions: list[dict]
     latest_agent_runs: list[dict]

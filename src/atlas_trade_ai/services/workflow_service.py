@@ -48,6 +48,27 @@ class WorkflowService:
         generated_task_ids: list[str] = []
         generated_exception_ids: list[str] = []
         notification_ids: list[str] = []
+        orchestration_escalation = (orchestration or {}).get("escalation") or {}
+        if orchestration_escalation.get("required"):
+            escalation_receivers = [
+                item["user_id"]
+                for item in orchestration_escalation.get("resolved_targets", [])
+                if item.get("user_id")
+            ]
+            if escalation_receivers:
+                escalation_notification = self.notification_service.send_dingtalk(
+                    {
+                        "template_code": f"ORCH_ESCALATION_{payload['event_type']}",
+                        "receiver_ids": escalation_receivers,
+                        "payload": {
+                            "order_no": context_payload["order_context"]["order_no"],
+                            "message": orchestration["decision_summary"],
+                            "escalation_level": orchestration_escalation.get("level"),
+                            "targets": orchestration_escalation.get("targets", []),
+                        },
+                    }
+                )
+                notification_ids.append(escalation_notification["notification_id"])
         for agent_key in rule.get("subscribers", []):
             agent_service = self.agent_registry.get_agent_service(agent_key)
             if agent_service is None:

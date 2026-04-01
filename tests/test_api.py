@@ -58,6 +58,15 @@ def test_workbench_summary_endpoint() -> None:
     payload = response.json()
     assert "order_count" in payload["data"]
     assert "agent_run_count" in payload["data"]
+    assert "escalated_order_count" in payload["data"]
+
+
+def test_workbench_escalations_endpoint() -> None:
+    client.post("/api/demo/scenarios/doc_missing_ord_002/run")
+    response = client.get("/api/workbench/escalations")
+    assert response.status_code == 200
+    payload = response.json()
+    assert isinstance(payload["data"], list)
 
 
 def test_rule_catalog_endpoint() -> None:
@@ -200,6 +209,7 @@ def test_orchestrator_repeated_event_escalates() -> None:
     orchestration = response.json()["data"]["result"]["orchestration"]
     assert orchestration["escalation"]["required"] is True
     assert orchestration["escalation"]["level"] in {"high", "critical"}
+    assert orchestration["escalation"]["resolved_targets"]
 
 
 def test_orchestrator_blocks_illegal_transition() -> None:

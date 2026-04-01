@@ -13,6 +13,7 @@ from atlas_trade_ai.api.routes import (
     exceptions,
     integrations,
     notifications,
+    orchestration_monitor,
     orders,
     order_progress,
     order_orchestrator,
@@ -37,6 +38,7 @@ api_router.include_router(agent_catalog.router)
 api_router.include_router(agent_runs.router)
 api_router.include_router(notifications.router)
 api_router.include_router(workbench.router)
+api_router.include_router(orchestration_monitor.router)
 api_router.include_router(integrations.router)
 api_router.include_router(rules.router)
 api_router.include_router(demo.router)

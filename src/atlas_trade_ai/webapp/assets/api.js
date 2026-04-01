@@ -10,6 +10,10 @@ export async function getWorkbench() {
   return (await fetchJson("/api/workbench/summary")).data;
 }
 
+export async function getEscalations() {
+  return (await fetchJson("/api/workbench/escalations")).data;
+}
+
 export async function getOrders() {
   return (await fetchJson("/api/orders")).data.items;
 }

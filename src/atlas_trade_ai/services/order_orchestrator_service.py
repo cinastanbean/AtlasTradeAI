@@ -22,6 +22,10 @@ class OrderOrchestratorService:
         self.state_machine = config.get("state_machine", {})
         self.escalation_defaults = config.get("escalation_defaults", {})
         self.rules = {item["event_type"]: item for item in config["rules"]}
+        org = loader.load("organization_directory.json")
+        self.users = {item["user_id"]: item for item in org.get("users", [])}
+        self.agent_owners = org.get("agent_owners", {})
+        self.critical_watchers = org.get("critical_watchers", [])
 
     def orchestrate(self, payload: dict, subscribers: list[str]) -> dict:
         order_id = payload.get("order_id")
@@ -145,6 +149,11 @@ class OrderOrchestratorService:
                 if item.get("order_id") == order_id and item.get("event_type") == payload["event_type"]
             ]
         )
+        recent_event_types = {
+            item.get("event_type")
+            for item in self.store.list_events()
+            if item.get("order_id") == order_id
+        }
         open_exception_count = len(
             [
                 item
@@ -166,6 +175,7 @@ class OrderOrchestratorService:
         level = "none"
         reasons: list[str] = []
         targets: list[str] = []
+        composite_signals: list[str] = []
         if rule.get("blocked") and rule.get("escalation_strategy") == "immediate":
             level = "high"
             reasons.append("当前事件会阻塞订单推进，需立即升级处理")
@@ -184,15 +194,30 @@ class OrderOrchestratorService:
         if customer_level in {"战略客户", "重点客户"} and rule.get("blocked"):
             level = "critical" if level in {"high", "medium"} else "high"
             reasons.append(f"客户等级为 {customer_level}，需提高处理关注度")
+        if {"production.milestone_delayed", "document.missing"}.issubset(recent_event_types):
+            level = "critical"
+            reasons.append("生产异常与单证异常同时存在，形成跨层阻塞")
+            composite_signals.append("cross_layer_blocking")
+            targets.extend(["supply_chain_agent", "customs_agent", "follow_up_agent"])
+        if {"logistics.delayed", "payment.overdue"}.issubset(recent_event_types):
+            level = "critical"
+            reasons.append("物流延误与回款逾期同时存在，形成交付与资金复合风险")
+            composite_signals.append("delivery_finance_compound_risk")
+            targets.extend(["logistics_agent", "finance_agent", "follow_up_agent"])
+        if len(composite_signals) >= 1 and "order_orchestrator" not in targets:
+            targets.append("order_orchestrator")
 
         unique_targets = [item for item in dict.fromkeys(targets) if item]
         if level == "none":
             return self._build_no_escalation()
+        resolved_targets = self._resolve_targets(unique_targets, order)
         return {
             "level": level,
             "required": True,
             "reasons": reasons,
             "targets": unique_targets,
+            "resolved_targets": resolved_targets,
+            "composite_signals": composite_signals,
         }
 
     def _build_no_escalation(self) -> dict:
@@ -201,6 +226,8 @@ class OrderOrchestratorService:
             "required": False,
             "reasons": [],
             "targets": [],
+            "resolved_targets": [],
+            "composite_signals": [],
         }
 
     def _merge_with_transition_block(self, escalation: dict, previous_status: str | None, event_type: str) -> dict:
@@ -217,6 +244,8 @@ class OrderOrchestratorService:
             "required": True,
             "reasons": reasons,
             "targets": targets,
+            "resolved_targets": self._resolve_targets(targets, {"owner_id": None, "customer_id": None}),
+            "composite_signals": escalation.get("composite_signals", []),
         }
 
     def _compose_summary(self, base_summary: str, transition_allowed: bool, escalation: dict) -> str:
@@ -226,6 +255,29 @@ class OrderOrchestratorService:
         if escalation.get("required"):
             parts.append(f"已触发 {escalation['level']} 级升级。")
         return "".join(parts)
+
+    def _resolve_targets(self, targets: list[str], order: dict) -> list[dict]:
+        owner_id = order.get("owner_id")
+        if owner_id is None and order.get("customer_id"):
+            owner_id = self.store.get_customer(order["customer_id"]).get("owner_id")
+        resolved: list[dict] = []
+        for target in targets:
+            user_ids = list(self.agent_owners.get(target, []))
+            if target in {"follow_up_agent", "sales_agent", "crm_agent"} and owner_id:
+                user_ids = [owner_id] + user_ids
+            if target == "order_orchestrator":
+                user_ids = user_ids + self.critical_watchers
+            for user_id in dict.fromkeys([item for item in user_ids if item]):
+                user = self.users.get(user_id, {"user_id": user_id, "name": user_id, "role": "未知角色"})
+                resolved.append(
+                    {
+                        "target": target,
+                        "user_id": user_id,
+                        "user_name": user["name"],
+                        "role": user["role"],
+                    }
+                )
+        return resolved
 
     def _layer_for_status(self, status: str | None) -> str | None:
         if status is None:
