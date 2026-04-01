@@ -14,6 +14,11 @@ export async function getEscalations() {
   return (await fetchJson("/api/workbench/escalations")).data;
 }
 
+export async function getSlaOverdue(nowIso = null) {
+  const suffix = nowIso ? `?now_iso=${encodeURIComponent(nowIso)}` : "";
+  return (await fetchJson(`/api/workbench/sla-overdue${suffix}`)).data;
+}
+
 export async function getOrders() {
   return (await fetchJson("/api/orders")).data.items;
 }
@@ -28,6 +33,10 @@ export async function getOrderProgress(orderId) {
 
 export async function getAgentCatalog() {
   return (await fetchJson("/api/agents/catalog")).data;
+}
+
+export async function getAgentMonitor() {
+  return (await fetchJson("/api/agents/monitor")).data;
 }
 
 export async function getAgentRuns() {

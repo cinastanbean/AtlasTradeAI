@@ -55,6 +55,9 @@ class IntelligentRoleAgentService:
             "customs_agent": self._build_customs_result,
             "finance_agent": self._build_finance_result,
             "customer_service_agent": self._build_customer_service_result,
+            "document_intelligence_agent": self._build_document_intelligence_result,
+            "operations_analyst_agent": self._build_operations_analyst_result,
+            "knowledge_agent": self._build_knowledge_result,
         }.get(self.agent_key, self._build_fallback_result)
         result = builder(event_type, order, customer, payment, payload | {"event_payload": event_payload})
         result["engine"] = {
@@ -322,4 +325,61 @@ Agent: {self.agent_name}
             tasks=[{"title": f"{self.agent_name} 跟进任务", "assignee_role": self.agent_name, "priority": "medium", "due_hint": "今天内"}],
             exceptions=[],
             notification=f"{self.agent_name} 已接管事件 {event_type}。",
+        )
+
+    def _build_document_intelligence_result(self, event_type: str, order: dict, customer: dict, payment: dict, payload: dict) -> dict:
+        reason = "单证资料需要进一步抽取、比对和一致性校验，以减少人工检查成本。"
+        return self._base_result(
+            summary=f"Document Intelligence Agent 已对订单 {order['order_no']} 的单证问题进行语义分析，建议优先检查一致性和缺失项。",
+            risk_level="high",
+            risk_type="document_intelligence",
+            reason=reason,
+            actions=[
+                "抽取事件中的缺失资料与驳回原因",
+                "比对 CI、PL、报关资料中的品名、数量、材质和申报要素",
+                "输出修正清单并给单证人员参考",
+            ],
+            tasks=[
+                {"title": "生成单证修正清单", "assignee_role": "单证", "priority": "high", "due_hint": "2小时内"},
+            ],
+            exceptions=[],
+            notification=f"Document Intelligence Agent 已生成订单 {order['order_no']} 的单证检查建议。",
+        )
+
+    def _build_operations_analyst_result(self, event_type: str, order: dict, customer: dict, payment: dict, payload: dict) -> dict:
+        reason = "当前事件可用于经营复盘、异常归因和经营指标分析。"
+        return self._base_result(
+            summary=f"Operations Analyst Agent 已识别订单 {order['order_no']} 的经营分析价值，建议纳入日报和复盘结论。",
+            risk_level="low" if event_type == "payment.completed" else "medium",
+            risk_type="operations_analysis",
+            reason=reason,
+            actions=[
+                "沉淀本次事件对交付、回款或服务的影响",
+                "判断是否需要进入经营日报、周报或专项复盘",
+                "提炼异常归因与改进建议供管理层参考",
+            ],
+            tasks=[
+                {"title": "生成经营分析摘要", "assignee_role": "运营分析", "priority": "medium", "due_hint": "今天内"},
+            ],
+            exceptions=[],
+            notification=f"Operations Analyst Agent 已为订单 {order['order_no']} 生成经营复盘建议。",
+        )
+
+    def _build_knowledge_result(self, event_type: str, order: dict, customer: dict, payment: dict, payload: dict) -> dict:
+        reason = "当前事件具有知识沉淀价值，适合提炼为 SOP、案例或经验库条目。"
+        return self._base_result(
+            summary=f"Knowledge Agent 已判断订单 {order['order_no']} 的本次事件可沉淀为知识资产，建议归档处理经验。",
+            risk_level="low",
+            risk_type="knowledge_capture",
+            reason=reason,
+            actions=[
+                "提取本次事件中的关键处理动作和经验",
+                "归档为案例、SOP 补充项或 FAQ",
+                "为后续 Agent 提供可复用知识线索",
+            ],
+            tasks=[
+                {"title": "归档案例与经验", "assignee_role": "知识管理", "priority": "low", "due_hint": "本周内"},
+            ],
+            exceptions=[],
+            notification=f"Knowledge Agent 已为订单 {order['order_no']} 生成知识归档建议。",
         )

@@ -20,29 +20,39 @@
       <main class="content">
         <header class="page-header">
           <div>
-            <h1>Agent 运行中心</h1>
-            <p>查看各 Agent 的职责、订阅事件和最近执行结果。</p>
+            <h1>Agent 监控中台</h1>
+            <p>查看每个 Agent 的技能、运行模式、触发事件、执行记录与整体工作效果。</p>
           </div>
           <div class="toolbar">
             <button id="refresh-agents" class="primary">刷新 Agent</button>
           </div>
         </header>
 
+        <section id="agent-kpis" class="kpi-grid"></section>
+
         <section class="grid two-col">
           <div class="panel">
             <div class="panel-title">
-              <h2>Agent 目录</h2>
-              <span>角色层与职责</span>
+              <h2>Agent 技能画像</h2>
+              <span>角色层、技能、能力边界</span>
             </div>
             <div id="agent-catalog" class="list"></div>
           </div>
           <div class="panel">
             <div class="panel-title">
-              <h2>执行日志</h2>
-              <span>最近触发的运行记录</span>
+              <h2>最近执行日志</h2>
+              <span>最近触发的工作记录</span>
             </div>
             <div id="agent-runs" class="list"></div>
           </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Agent 运行表现</h2>
+            <span>运行次数、最近执行、引擎来源</span>
+          </div>
+          <div id="agent-performance" class="list"></div>
         </section>
       </main>
     </div>

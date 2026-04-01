@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from atlas_trade_ai.api.routes import (
     agents,
     agent_catalog,
+    agent_monitor,
     agent_runs,
     customers,
     dashboard,
@@ -19,6 +20,7 @@ from atlas_trade_ai.api.routes import (
     order_orchestrator,
     overview,
     rules,
+    sla_monitor,
     tasks,
     workbench,
 )
@@ -35,10 +37,12 @@ api_router.include_router(exceptions.router)
 api_router.include_router(events.router)
 api_router.include_router(agents.router)
 api_router.include_router(agent_catalog.router)
+api_router.include_router(agent_monitor.router)
 api_router.include_router(agent_runs.router)
 api_router.include_router(notifications.router)
 api_router.include_router(workbench.router)
 api_router.include_router(orchestration_monitor.router)
+api_router.include_router(sla_monitor.router)
 api_router.include_router(integrations.router)
 api_router.include_router(rules.router)
 api_router.include_router(demo.router)

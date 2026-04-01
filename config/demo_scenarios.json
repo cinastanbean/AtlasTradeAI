@@ -106,6 +106,63 @@
           "customer_message": "客户反馈到货后外箱破损，要求解释和补偿方案。"
         }
       }
+    },
+    {
+      "code": "customs_rejected_ord_002",
+      "name": "清关驳回：外贸订单",
+      "description": "模拟清关资料被驳回，触发 Customs Agent、Document Intelligence Agent 和物流协同。",
+      "event": {
+        "event_type": "customs.rejected",
+        "event_time": "2026-04-02T10:30:00+08:00",
+        "source_system": "atlas_trade_ai",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_002",
+        "order_id": "ord_002",
+        "customer_id": "cus_002",
+        "priority": "P1",
+        "payload": {
+          "rejected_reason": "品名与申报要素不一致",
+          "required_fix": ["统一 CI 与报关品名", "补充材质说明"]
+        }
+      }
+    },
+    {
+      "code": "payment_completed_ord_004",
+      "name": "回款完成：内销订单",
+      "description": "模拟回款完成，触发财务确认、经营分析和知识沉淀。",
+      "event": {
+        "event_type": "payment.completed",
+        "event_time": "2026-04-02T11:30:00+08:00",
+        "source_system": "kingdee_k3cloud",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_004",
+        "order_id": "ord_004",
+        "customer_id": "cus_004",
+        "priority": "P3",
+        "payload": {
+          "received_amount": 56000.0,
+          "payment_channel": "bank_transfer"
+        }
+      }
+    },
+    {
+      "code": "after_sales_closed_ord_001",
+      "name": "售后关闭：内销订单",
+      "description": "模拟售后工单关闭，触发 CRM、客服、经营分析和知识沉淀。",
+      "event": {
+        "event_type": "after_sales.closed",
+        "event_time": "2026-04-02T12:00:00+08:00",
+        "source_system": "atlas_trade_ai",
+        "biz_object_type": "order",
+        "biz_object_id": "ord_001",
+        "order_id": "ord_001",
+        "customer_id": "cus_001",
+        "priority": "P3",
+        "payload": {
+          "resolution": "已补发包装件并给予运费补贴",
+          "customer_satisfaction": "high"
+        }
+      }
     }
   ]
 }

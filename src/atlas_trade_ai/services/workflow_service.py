@@ -50,6 +50,19 @@ class WorkflowService:
         notification_ids: list[str] = []
         orchestration_escalation = (orchestration or {}).get("escalation") or {}
         if orchestration_escalation.get("required"):
+            for target in orchestration_escalation.get("resolved_targets", []):
+                escalation_task = self.task_service.create_task(
+                    {
+                        "task_type": "order_orchestrator_escalation",
+                        "task_title": f"处理中枢升级：{context_payload['order_context']['order_no']}",
+                        "task_description": orchestration["decision_summary"],
+                        "related_order_id": context_payload["order_context"]["order_id"],
+                        "assignee_id": target.get("user_id"),
+                        "priority": "high" if orchestration_escalation.get("level") in {"high", "critical"} else "medium",
+                        "due_time": f"{orchestration.get('sla_hours') or 4}小时内",
+                    }
+                )
+                generated_task_ids.append(escalation_task["task_id"])
             escalation_receivers = [
                 item["user_id"]
                 for item in orchestration_escalation.get("resolved_targets", [])

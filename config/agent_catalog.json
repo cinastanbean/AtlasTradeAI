@@ -71,6 +71,33 @@
       "subscribed_events": ["after_sales.created", "after_sales.complaint_created", "after_sales.closed"],
       "execution_mode": "hybrid",
       "intelligence_type": "投诉分流 + 服务闭环建议"
+    },
+    {
+      "agent_key": "document_intelligence_agent",
+      "name": "Document Intelligence Agent",
+      "layer": "交付与合规层",
+      "description": "负责单证抽取、比对、一致性检查和资料草稿建议",
+      "subscribed_events": ["document.missing", "customs.rejected"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "单证理解 + 一致性校验建议"
+    },
+    {
+      "agent_key": "operations_analyst_agent",
+      "name": "Operations Analyst Agent",
+      "layer": "经营分析层",
+      "description": "负责经营诊断、关键指标分析、风险复盘和日报周报建议",
+      "subscribed_events": ["payment.completed", "after_sales.closed", "logistics.delayed"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "经营诊断 + 复盘分析"
+    },
+    {
+      "agent_key": "knowledge_agent",
+      "name": "Knowledge Agent",
+      "layer": "知识沉淀层",
+      "description": "负责 SOP 沉淀、案例归档、知识抽取和经验复用建议",
+      "subscribed_events": ["after_sales.closed", "payment.completed", "customs.rejected"],
+      "execution_mode": "hybrid",
+      "intelligence_type": "知识沉淀 + 经验归档"
     }
   ]
 }

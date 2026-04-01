@@ -89,6 +89,7 @@ class OrderOrchestratorService:
 
         order["last_orchestration"] = {
             "event_type": payload["event_type"],
+            "event_time": payload.get("event_time"),
             "decision_summary": self._compose_summary(rule["decision_summary"], transition_allowed, escalation),
             "status_before": previous_status,
             "status_after": status_after,

@@ -63,6 +63,7 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 - `GET /api/overview/architecture`
 - `GET /api/workbench/summary`
 - `GET /api/workbench/escalations`
+- `GET /api/workbench/sla-overdue`
 - `GET /api/dashboard/orders/{id}`
 
 ### 业务主线
@@ -92,6 +93,7 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 - `POST /api/agents/follow-up/run`
 - `GET /api/agent-runs`
 - `GET /api/agents/catalog`
+- `GET /api/agents/monitor`
 
 ### 配置与集成
 
@@ -177,7 +179,9 @@ PYTHONPATH=src python -m pytest -q
 - `/ui/orders.html`
 - `/ui/agents.html`
 - `/ui/integrations.html`
+- `/api/agents/monitor`
 - `/api/workbench/escalations`
+- `/api/workbench/sla-overdue`
 - `/api/overview/architecture`
 - `/api/agents/catalog`
 - [第一版工程骨架说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/04-implementation-roadmap/engineering-skeleton-overview.md)

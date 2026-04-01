@@ -2,6 +2,7 @@ import {
   getAgentRuns,
   getEscalations,
   getScenarios,
+  getSlaOverdue,
   getWorkbench,
   runScenario,
 } from "./api.js";
@@ -13,6 +14,7 @@ function renderKpis(summary) {
     ["待处理任务", summary.pending_task_count],
     ["Agent 运行次数", summary.agent_run_count],
     ["升级订单数", summary.escalated_order_count],
+    ["SLA 超时数", summary.sla_overdue_count],
   ];
   document.querySelector("#kpis").innerHTML = kpis
     .map(
@@ -54,11 +56,12 @@ function renderList(selector, items, renderItem) {
 }
 
 async function loadDashboard() {
-  const [summary, runs, scenarios, escalations] = await Promise.all([
+  const [summary, runs, scenarios, escalations, slaOverdue] = await Promise.all([
     getWorkbench(),
     getAgentRuns(),
     getScenarios(),
     getEscalations(),
+    getSlaOverdue(),
   ]);
   renderKpis(summary);
   renderProcessMap();
@@ -91,6 +94,17 @@ async function loadDashboard() {
         <p>${item.current_status || "-"} / 升级级别 ${item.escalation_level || "-"}</p>
         <p>下一责任 Agent: ${item.next_owner_agent || "-"}</p>
         <p>升级对象: ${(item.escalation_targets || []).map((t) => t.user_name).join(" / ") || "-"}</p>
+      </div>
+    `
+  );
+  renderList(
+    "#sla-overdue-orders",
+    slaOverdue.slice(0, 6),
+    (item) => `
+      <div class="list-card">
+        <h3>${item.order_no}</h3>
+        <p>已超时 ${item.overdue_hours} 小时 / 级别 ${item.escalation_level || "-"}</p>
+        <p>下一责任 Agent: ${item.next_owner_agent || "-"}</p>
       </div>
     `
   );

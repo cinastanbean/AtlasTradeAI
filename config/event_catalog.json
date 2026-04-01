@@ -14,6 +14,7 @@
     {"event_type": "payment.due_soon", "domain": "finance", "priority": "P2"},
     {"event_type": "payment.overdue", "domain": "finance", "priority": "P1"},
     {"event_type": "payment.completed", "domain": "finance", "priority": "P3"},
+    {"event_type": "document.completed", "domain": "compliance", "priority": "P3"},
     {"event_type": "after_sales.created", "domain": "service", "priority": "P2"},
     {"event_type": "after_sales.complaint_created", "domain": "service", "priority": "P1"},
     {"event_type": "after_sales.closed", "domain": "service", "priority": "P3"}

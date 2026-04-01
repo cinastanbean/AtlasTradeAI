@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 from atlas_trade_ai.services.agent_registry_service import AgentRegistryService
+from atlas_trade_ai.services.agent_monitor_service import AgentMonitorService
 from atlas_trade_ai.core.bootstrap import build_seed_store
 from atlas_trade_ai.core.config_loader import JsonConfigLoader
 from atlas_trade_ai.services.agent_service import FollowUpAgentService
@@ -21,6 +22,7 @@ from atlas_trade_ai.services.order_progress_service import OrderProgressService
 from atlas_trade_ai.services.orchestration_monitor_service import OrchestrationMonitorService
 from atlas_trade_ai.services.overview_service import OverviewService
 from atlas_trade_ai.services.rule_registry_service import RuleRegistryService
+from atlas_trade_ai.services.sla_monitor_service import SlaMonitorService
 from atlas_trade_ai.services.task_service import TaskService
 from atlas_trade_ai.services.workbench_service import WorkbenchService
 from atlas_trade_ai.services.workflow_service import WorkflowService
@@ -32,6 +34,7 @@ class AppContainer:
         self.config_loader = JsonConfigLoader()
         self.agent_run_service = AgentRunService(self.store)
         self.agent_registry_service = AgentRegistryService(self.config_loader, self.agent_run_service)
+        self.agent_monitor_service = AgentMonitorService(self.store, self.agent_registry_service)
         self.rule_registry_service = RuleRegistryService(self.config_loader)
         self.customer_service = CustomerService(self.store)
         self.order_service = OrderService(self.store)
@@ -46,6 +49,11 @@ class AppContainer:
         self.task_service = TaskService(self.store)
         self.exception_service = ExceptionService(self.store)
         self.notification_service = NotificationService(self.store)
+        self.sla_monitor_service = SlaMonitorService(
+            self.store,
+            self.task_service,
+            self.notification_service,
+        )
         self.follow_up_agent_service = FollowUpAgentService(self.agent_run_service)
         self.context_builder_service = ContextBuilderService(self.store, self.order_service)
         self.workflow_service = WorkflowService(

@@ -69,6 +69,15 @@ def test_workbench_escalations_endpoint() -> None:
     assert isinstance(payload["data"], list)
 
 
+def test_workbench_sla_overdue_endpoint() -> None:
+    client.post("/api/demo/scenarios/doc_missing_ord_002/run")
+    response = client.get("/api/workbench/sla-overdue?now_iso=2026-04-02T18:00:00+08:00")
+    assert response.status_code == 200
+    payload = response.json()
+    assert isinstance(payload["data"], list)
+    assert any(item["order_id"] == "ord_002" for item in payload["data"])
+
+
 def test_rule_catalog_endpoint() -> None:
     response = client.get("/api/rules/workflow")
     assert response.status_code == 200
@@ -111,12 +120,27 @@ def test_frontend_orders_page_endpoint() -> None:
     assert "订单作战看板" in response.text
 
 
+def test_frontend_agents_page_endpoint() -> None:
+    response = client.get("/ui/agents.html")
+    assert response.status_code == 200
+    assert "Agent 监控中台" in response.text
+
+
 def test_agent_catalog_endpoint() -> None:
     response = client.get("/api/agents/catalog")
     assert response.status_code == 200
     payload = response.json()
     assert any(item["agent_key"] == "finance_agent" for item in payload["data"])
     assert any(item["execution_mode"] == "hybrid" for item in payload["data"])
+    assert any(item["agent_key"] == "knowledge_agent" for item in payload["data"])
+
+
+def test_agent_monitor_endpoint() -> None:
+    response = client.get("/api/agents/monitor")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["data"]["agent_count"] >= 10
+    assert isinstance(payload["data"]["agent_cards"], list)
 
 
 def test_order_progress_endpoint() -> None:
@@ -151,6 +175,22 @@ def test_sales_and_crm_scenario_creates_two_agent_runs() -> None:
     names = {item["agent_name"] for item in runs}
     assert "Sales Agent" in names
     assert "CRM Agent" in names
+
+
+def test_document_intelligence_scenario_creates_agent_run() -> None:
+    response = client.post("/api/demo/scenarios/customs_rejected_ord_002/run")
+    assert response.status_code == 200
+    runs = client.get("/api/agent-runs").json()["data"]
+    assert any(item["agent_name"] == "Document Intelligence Agent" for item in runs)
+
+
+def test_operations_and_knowledge_scenario_creates_agent_runs() -> None:
+    response = client.post("/api/demo/scenarios/payment_completed_ord_004/run")
+    assert response.status_code == 200
+    runs = client.get("/api/agent-runs").json()["data"]
+    names = {item["agent_name"] for item in runs}
+    assert "Operations Analyst Agent" in names
+    assert "Knowledge Agent" in names
 
 
 def test_generic_agent_run_endpoint() -> None:
@@ -210,6 +250,8 @@ def test_orchestrator_repeated_event_escalates() -> None:
     assert orchestration["escalation"]["required"] is True
     assert orchestration["escalation"]["level"] in {"high", "critical"}
     assert orchestration["escalation"]["resolved_targets"]
+    tasks = client.get("/api/tasks").json()["data"]["items"]
+    assert any(item["task_title"].startswith("处理中枢升级") for item in tasks)
 
 
 def test_orchestrator_blocks_illegal_transition() -> None:
@@ -237,3 +279,14 @@ def test_orchestrator_blocks_illegal_transition() -> None:
     assert orchestration["transition_allowed"] is False
     assert orchestration["status_after"] == orchestration["status_before"]
     assert orchestration["escalation"]["required"] is True
+
+
+def test_task_status_update_endpoint() -> None:
+    tasks = client.get("/api/tasks").json()["data"]["items"]
+    task_id = tasks[0]["task_id"]
+    response = client.post(
+        f"/api/tasks/{task_id}/status",
+        json={"task_status": "已完成", "operator": "tester"},
+    )
+    assert response.status_code == 200
+    assert response.json()["data"]["task_status"] == "已完成"

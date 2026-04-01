@@ -38,7 +38,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscribers": ["customs_agent", "follow_up_agent"]
+      "subscribers": ["customs_agent", "document_intelligence_agent", "follow_up_agent"]
     },
     {
       "rule_code": "R007",
@@ -46,7 +46,7 @@
       "task_enabled": true,
       "exception_enabled": true,
       "notification_enabled": true,
-      "subscribers": ["customs_agent", "follow_up_agent", "logistics_agent"]
+      "subscribers": ["customs_agent", "document_intelligence_agent", "follow_up_agent", "logistics_agent"]
     },
     {
       "rule_code": "R008",
@@ -79,6 +79,22 @@
       "exception_enabled": true,
       "notification_enabled": true,
       "subscribers": ["customer_service_agent", "crm_agent"]
+    },
+    {
+      "rule_code": "R012",
+      "event_type": "payment.completed",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscribers": ["finance_agent", "operations_analyst_agent", "knowledge_agent"]
+    },
+    {
+      "rule_code": "R013",
+      "event_type": "after_sales.closed",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscribers": ["customer_service_agent", "crm_agent", "operations_analyst_agent", "knowledge_agent"]
     }
   ]
 }
