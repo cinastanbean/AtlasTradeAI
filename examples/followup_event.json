@@ -1,0 +1,49 @@
+{
+  "trigger_event": {
+    "event_id": "evt_001",
+    "event_type": "production.milestone_delayed",
+    "event_time": "2026-04-01T10:30:00+08:00",
+    "source_system": "kingdee_k3cloud",
+    "biz_object_type": "order",
+    "biz_object_id": "ord_001"
+  },
+  "order_context": {
+    "order_id": "ord_001",
+    "order_no": "SO-2026-0001",
+    "current_status": "执行中",
+    "sub_status": "生产中",
+    "risk_level": "medium",
+    "planned_delivery_date": "2026-04-10",
+    "payment_status": "待回款",
+    "total_amount": 128000.0,
+    "currency": "CNY"
+  },
+  "customer_context": {
+    "customer_id": "cus_001",
+    "customer_name": "华东重点客户A",
+    "customer_level": "重点客户",
+    "business_type": "内销",
+    "owner_id": "user_sales_01"
+  },
+  "fulfillment_context": {
+    "milestones": [
+      {
+        "milestone_type": "生产完成",
+        "planned_time": "2026-04-05T18:00:00+08:00",
+        "actual_time": null,
+        "milestone_status": "delayed",
+        "is_overdue": true
+      }
+    ],
+    "latest_logistics_status": null,
+    "document_status": "not_required",
+    "customs_status": null,
+    "exceptions": []
+  },
+  "payment_context": {
+    "receivable_amount": 128000.0,
+    "received_amount": 0.0,
+    "due_date": "2026-04-30",
+    "overdue_days": 0
+  }
+}

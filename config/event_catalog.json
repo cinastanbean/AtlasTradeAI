@@ -1,0 +1,14 @@
+{
+  "events": [
+    {"event_type": "quotation.accepted", "domain": "sales", "priority": "P3"},
+    {"event_type": "order.confirmed", "domain": "order", "priority": "P2"},
+    {"event_type": "order.status_changed", "domain": "order", "priority": "P3"},
+    {"event_type": "production.milestone_delayed", "domain": "supply_chain", "priority": "P1"},
+    {"event_type": "shipment.ready", "domain": "delivery", "priority": "P2"},
+    {"event_type": "shipment.dispatched", "domain": "delivery", "priority": "P3"},
+    {"event_type": "document.missing", "domain": "compliance", "priority": "P1"},
+    {"event_type": "logistics.delayed", "domain": "delivery", "priority": "P2"},
+    {"event_type": "payment.due_soon", "domain": "finance", "priority": "P2"},
+    {"event_type": "payment.overdue", "domain": "finance", "priority": "P1"}
+  ]
+}

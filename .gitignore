@@ -1,0 +1,46 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS thumbnails
+**/__MACOSX/**
+**/.DS_Store
+
+# Build outputs (if any)
+dist/
+build/
+coverage/
+
+# Dependencies (if any)
+node_modules/
+
+# Environment and local config
+.env
+.env.*
+
+# Python cache (if any)
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+
+# Generic caches
+.cache/
+
+# Local databases and exports
+*.sqlite
+*.sqlite3
+*.db

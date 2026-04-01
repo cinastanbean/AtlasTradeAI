@@ -1,0 +1,60 @@
+{
+  "rules": [
+    {
+      "rule_code": "R001",
+      "event_type": "order.confirmed",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R002",
+      "event_type": "production.milestone_delayed",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R004",
+      "event_type": "shipment.ready",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R006",
+      "event_type": "document.missing",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R008",
+      "event_type": "logistics.delayed",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R009",
+      "event_type": "payment.due_soon",
+      "task_enabled": true,
+      "exception_enabled": false,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    },
+    {
+      "rule_code": "R010",
+      "event_type": "payment.overdue",
+      "task_enabled": true,
+      "exception_enabled": true,
+      "notification_enabled": true,
+      "subscriber": "follow_up_agent"
+    }
+  ]
+}
