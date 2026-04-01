@@ -19,6 +19,9 @@ async function renderDetail() {
     <p>当前层级: ${progress.current_layer || "-"}</p>
     <p>下一责任 Agent: ${progress.next_owner_agent || "-"}</p>
     <p>阻塞状态: ${progress.blocked ? "是" : "否"}</p>
+    <p>SLA: ${progress.sla_hours ? `${progress.sla_hours} 小时` : "-"}</p>
+    <p>升级级别: ${(progress.escalation && progress.escalation.level) || "none"}</p>
+    <p>升级对象: ${(progress.escalation && progress.escalation.targets && progress.escalation.targets.join(" / ")) || "-"}</p>
     <p>决策摘要: ${orchestration.decision_summary || "暂无最近编排结果"}</p>
   `;
   document.querySelector("#order-progress").innerHTML = progress.stages

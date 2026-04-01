@@ -10,9 +10,10 @@ class OrderProgressService:
     def get_progress(self, order_id: str) -> dict:
         order = self.store.get_order(order_id)
         current_status = order["current_status"]
-        current_layer = order.get("current_layer")
-        next_owner_agent = order.get("next_owner_agent")
-        blocked = order.get("blocked", False)
+        last_orchestration = order.get("last_orchestration") or {}
+        current_layer = order.get("current_layer") or last_orchestration.get("target_layer")
+        next_owner_agent = order.get("next_owner_agent") or last_orchestration.get("next_owner_agent")
+        blocked = last_orchestration.get("blocked", order.get("blocked", False))
         status_order = [
             "待确认",
             "已确认",
@@ -57,5 +58,7 @@ class OrderProgressService:
             "current_layer": current_layer,
             "next_owner_agent": next_owner_agent,
             "blocked": blocked,
+            "sla_hours": last_orchestration.get("sla_hours"),
+            "escalation": last_orchestration.get("escalation"),
             "stages": stages,
         }

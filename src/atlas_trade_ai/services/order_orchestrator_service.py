@@ -19,6 +19,8 @@ class OrderOrchestratorService:
         self.agent_run_service = agent_run_service
         config = loader.load("order_orchestration_rules.json")
         self.status_layers = config["status_layers"]
+        self.state_machine = config.get("state_machine", {})
+        self.escalation_defaults = config.get("escalation_defaults", {})
         self.rules = {item["event_type"]: item for item in config["rules"]}
 
     def orchestrate(self, payload: dict, subscribers: list[str]) -> dict:
@@ -48,6 +50,9 @@ class OrderOrchestratorService:
                 "current_layer": current_layer,
                 "target_layer": current_layer,
                 "blocked": False,
+                "sla_hours": None,
+                "transition_allowed": True,
+                "escalation": self._build_no_escalation(),
                 "next_owner_agent": subscribers[0] if subscribers else None,
                 "next_agents": subscribers,
                 "decision_summary": "当前事件未命中订单编排规则，保持现有阶段。",
@@ -59,16 +64,28 @@ class OrderOrchestratorService:
         sub_status_after = rule["sub_status"]
         current_layer = self._layer_for_status(previous_status)
         target_layer = self._layer_for_status(status_after)
-        status_changed = previous_status != status_after or previous_sub_status != sub_status_after
+        transition_allowed = self._is_transition_allowed(previous_status, status_after, rule)
+        escalation = self._evaluate_escalation(order, payload, rule, subscribers)
+        status_changed = (
+            transition_allowed
+            and (previous_status != status_after or previous_sub_status != sub_status_after)
+        )
 
-        order["current_status"] = status_after
-        order["sub_status"] = sub_status_after
-        order["current_layer"] = target_layer
-        order["next_owner_agent"] = rule.get("next_owner_agent")
-        order["blocked"] = rule.get("blocked", False)
+        if transition_allowed:
+            order["current_status"] = status_after
+            order["sub_status"] = sub_status_after
+            order["current_layer"] = target_layer
+            order["next_owner_agent"] = rule.get("next_owner_agent")
+            order["blocked"] = rule.get("blocked", False)
+        else:
+            status_after = previous_status
+            sub_status_after = previous_sub_status
+            target_layer = current_layer
+            escalation = self._merge_with_transition_block(escalation, previous_status, payload["event_type"])
+
         order["last_orchestration"] = {
             "event_type": payload["event_type"],
-            "decision_summary": rule["decision_summary"],
+            "decision_summary": self._compose_summary(rule["decision_summary"], transition_allowed, escalation),
             "status_before": previous_status,
             "status_after": status_after,
             "sub_status_before": previous_sub_status,
@@ -76,6 +93,9 @@ class OrderOrchestratorService:
             "current_layer": current_layer,
             "target_layer": target_layer,
             "blocked": rule.get("blocked", False),
+            "sla_hours": rule.get("sla_hours"),
+            "transition_allowed": transition_allowed,
+            "escalation": escalation,
             "next_owner_agent": rule.get("next_owner_agent"),
             "next_agents": subscribers,
         }
@@ -91,12 +111,121 @@ class OrderOrchestratorService:
             "current_layer": current_layer,
             "target_layer": target_layer,
             "blocked": rule.get("blocked", False),
+            "sla_hours": rule.get("sla_hours"),
+            "transition_allowed": transition_allowed,
+            "escalation": escalation,
             "next_owner_agent": rule.get("next_owner_agent"),
             "next_agents": subscribers,
-            "decision_summary": rule["decision_summary"],
+            "decision_summary": self._compose_summary(rule["decision_summary"], transition_allowed, escalation),
         }
         self._log_run(order_id, payload["event_type"], payload, result)
         return result
+
+    def _is_transition_allowed(self, previous_status: str | None, target_status: str, rule: dict) -> bool:
+        allowed_from = rule.get("allowed_from")
+        if allowed_from and previous_status not in allowed_from:
+            return False
+        if previous_status is None:
+            return True
+        allowed_targets = self.state_machine.get(previous_status, [])
+        return target_status in allowed_targets if allowed_targets else True
+
+    def _evaluate_escalation(
+        self,
+        order: dict,
+        payload: dict,
+        rule: dict,
+        subscribers: list[str],
+    ) -> dict:
+        order_id = order["order_id"]
+        same_event_count = len(
+            [
+                item
+                for item in self.store.list_events()
+                if item.get("order_id") == order_id and item.get("event_type") == payload["event_type"]
+            ]
+        )
+        open_exception_count = len(
+            [
+                item
+                for item in self.store.list_exceptions()
+                if item.get("related_order_id") == order_id and item.get("exception_status") != "已解决"
+            ]
+        )
+        priority = payload.get("priority")
+        customer_level = self.store.get_customer(order["customer_id"]).get("customer_level")
+        repeat_threshold = rule.get(
+            "repeat_event_threshold",
+            self.escalation_defaults.get("repeat_event_threshold", 2),
+        )
+        exception_threshold = rule.get(
+            "open_exception_threshold",
+            self.escalation_defaults.get("open_exception_threshold", 2),
+        )
+
+        level = "none"
+        reasons: list[str] = []
+        targets: list[str] = []
+        if rule.get("blocked") and rule.get("escalation_strategy") == "immediate":
+            level = "high"
+            reasons.append("当前事件会阻塞订单推进，需立即升级处理")
+            targets.extend([rule.get("next_owner_agent"), "follow_up_agent"])
+        if same_event_count >= repeat_threshold:
+            level = "critical" if level == "high" else "high"
+            reasons.append(f"同类事件已累计触发 {same_event_count} 次")
+            targets.extend(["order_orchestrator", rule.get("next_owner_agent")])
+        if open_exception_count >= exception_threshold:
+            level = "critical" if level in {"high", "medium"} else "high"
+            reasons.append(f"当前订单已有 {open_exception_count} 条未解决异常")
+            targets.extend(["follow_up_agent", rule.get("next_owner_agent")])
+        if priority == "P1":
+            level = "critical" if level == "high" else (level if level != "none" else "high")
+            reasons.append("事件优先级为 P1")
+        if customer_level in {"战略客户", "重点客户"} and rule.get("blocked"):
+            level = "critical" if level in {"high", "medium"} else "high"
+            reasons.append(f"客户等级为 {customer_level}，需提高处理关注度")
+
+        unique_targets = [item for item in dict.fromkeys(targets) if item]
+        if level == "none":
+            return self._build_no_escalation()
+        return {
+            "level": level,
+            "required": True,
+            "reasons": reasons,
+            "targets": unique_targets,
+        }
+
+    def _build_no_escalation(self) -> dict:
+        return {
+            "level": "none",
+            "required": False,
+            "reasons": [],
+            "targets": [],
+        }
+
+    def _merge_with_transition_block(self, escalation: dict, previous_status: str | None, event_type: str) -> dict:
+        reasons = list(escalation.get("reasons", []))
+        reasons.append(f"事件 {event_type} 不允许从当前状态 {previous_status} 直接推进")
+        targets = list(dict.fromkeys(escalation.get("targets", []) + ["order_orchestrator"]))
+        level = escalation.get("level", "none")
+        if level == "none":
+            level = "high"
+        elif level == "high":
+            level = "critical"
+        return {
+            "level": level,
+            "required": True,
+            "reasons": reasons,
+            "targets": targets,
+        }
+
+    def _compose_summary(self, base_summary: str, transition_allowed: bool, escalation: dict) -> str:
+        parts = [base_summary]
+        if not transition_allowed:
+            parts.append("本次状态推进未通过状态机校验，已保持原阶段。")
+        if escalation.get("required"):
+            parts.append(f"已触发 {escalation['level']} 级升级。")
+        return "".join(parts)
 
     def _layer_for_status(self, status: str | None) -> str | None:
         if status is None:

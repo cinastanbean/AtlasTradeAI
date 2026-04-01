@@ -16,4 +16,6 @@ class OrderProgressRead(BaseModel):
     current_layer: str | None = None
     next_owner_agent: str | None = None
     blocked: bool = False
+    sla_hours: int | None = None
+    escalation: dict | None = None
     stages: list[OrderProgressStageRead]

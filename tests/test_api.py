@@ -125,6 +125,7 @@ def test_order_orchestration_endpoint() -> None:
     payload = response.json()
     assert payload["data"]["next_owner_agent"] == "finance_agent"
     assert payload["data"]["blocked"] is True
+    assert payload["data"]["escalation"]["required"] is True
 
 
 def test_demo_scenario_creates_agent_runs() -> None:
@@ -190,3 +191,39 @@ def test_generic_agent_run_endpoint() -> None:
     payload = response.json()
     assert payload["data"]["risk_assessment"]["risk_type"] == "finance_risk"
     assert payload["data"]["engine"]["mode"] in {"rules", "hybrid"}
+
+
+def test_orchestrator_repeated_event_escalates() -> None:
+    client.post("/api/demo/scenarios/doc_missing_ord_002/run")
+    response = client.post("/api/demo/scenarios/doc_missing_ord_002/run")
+    assert response.status_code == 200
+    orchestration = response.json()["data"]["result"]["orchestration"]
+    assert orchestration["escalation"]["required"] is True
+    assert orchestration["escalation"]["level"] in {"high", "critical"}
+
+
+def test_orchestrator_blocks_illegal_transition() -> None:
+    response = client.post(
+        "/api/events",
+        json={
+            "event_type": "payment.overdue",
+            "event_time": "2026-04-02T10:00:00+08:00",
+            "source_system": "kingdee_k3cloud",
+            "biz_object_type": "order",
+            "biz_object_id": "ord_001",
+            "order_id": "ord_001",
+            "customer_id": "cus_001",
+            "priority": "P1",
+            "payload": {
+                "receivable_amount": 128000.0,
+                "received_amount": 0.0,
+                "due_date": "2026-03-20",
+                "overdue_days": 10
+            },
+        },
+    )
+    assert response.status_code == 200
+    orchestration = response.json()["data"]["orchestration"]
+    assert orchestration["transition_allowed"] is False
+    assert orchestration["status_after"] == orchestration["status_before"]
+    assert orchestration["escalation"]["required"] is True

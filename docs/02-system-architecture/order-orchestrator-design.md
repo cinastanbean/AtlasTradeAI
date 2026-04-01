@@ -43,12 +43,13 @@
 ```mermaid
 flowchart LR
     A["业务事件进入"] --> B["Order Orchestrator"]
-    B --> C["判断订单阶段是否变化"]
+    B --> C["状态机校验：当前状态能否推进"]
     C --> D["判断是否阻塞"]
-    D --> E["决定下一责任 Agent"]
-    E --> F["回写订单主视图"]
-    F --> G["触发 Follow-up / Finance / Logistics 等 Agent"]
-    G --> H["生成任务 / 异常 / 通知"]
+    D --> E["判断是否需要升级"]
+    E --> F["决定下一责任 Agent"]
+    F --> G["回写订单主视图"]
+    G --> H["触发 Follow-up / Finance / Logistics 等 Agent"]
+    H --> I["生成任务 / 异常 / 通知"]
 ```
 
 ## 5. 当前已覆盖的关键事件
@@ -65,7 +66,49 @@ flowchart LR
 - `payment.overdue`
 - `after_sales.complaint_created`
 
-## 6. 当前输出结果
+## 6. 状态机与升级策略
+
+当前增强后的 `Order Orchestrator` 已具备：
+
+### 6.1 状态机校验
+
+会检查：
+
+- 当前事件是否允许从当前订单状态进入目标状态
+- 当前状态到目标状态是否符合状态机定义
+
+如果不允许：
+
+- 保持原订单状态
+- 记录非法流转原因
+- 自动触发升级信号
+
+### 6.2 升级策略
+
+当前会综合判断：
+
+- 事件是否属于阻塞型事件
+- 是否为 `P1` 优先级
+- 同类事件是否重复触发
+- 当前订单未解决异常数是否过多
+- 客户是否属于战略客户 / 重点客户
+
+当前会产出：
+
+- `escalation.level`
+- `escalation.required`
+- `escalation.reasons`
+- `escalation.targets`
+
+### 6.3 SLA 提示
+
+每类编排规则当前都可配置：
+
+- `sla_hours`
+
+用于提示当前阶段应在多长时间内完成响应。
+
+## 7. 当前输出结果
 
 `Order Orchestrator` 当前会输出：
 
@@ -76,6 +119,9 @@ flowchart LR
 - `current_layer`
 - `target_layer`
 - `blocked`
+- `sla_hours`
+- `transition_allowed`
+- `escalation`
 - `next_owner_agent`
 - `next_agents`
 - `decision_summary`
@@ -86,11 +132,11 @@ flowchart LR
 - 会把最新编排结果回写到订单对象中
 - 会在订单详情页和进度页中展示出来
 
-## 7. 后续建议
+## 8. 后续建议
 
 下一阶段建议继续增强：
 
-1. 将编排规则从静态映射提升为“状态机 + 条件判断”
-2. 引入 SLA、优先级和升级策略
-3. 让 Orchestrator 支持多事件合并判断
-4. 引入历史上下文，让其具备更强的流程推理能力
+1. 让升级策略支持按组织角色路由到具体人和具体群
+2. 让 Orchestrator 支持多事件合并判断
+3. 引入历史上下文，让其具备更强的流程推理能力
+4. 将部分策略开放为后台配置而不是本地 JSON

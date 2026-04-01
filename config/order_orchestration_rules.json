@@ -9,94 +9,141 @@
     "待回款": "资金结算层",
     "已完成": "售后服务层"
   },
+  "state_machine": {
+    "待确认": ["已确认"],
+    "已确认": ["执行中", "待发货"],
+    "执行中": ["执行中", "待发货"],
+    "待发货": ["待发货", "已发货", "运输 / 交付中", "待回款"],
+    "已发货": ["运输 / 交付中", "待回款"],
+    "运输 / 交付中": ["运输 / 交付中", "待回款", "已完成"],
+    "待回款": ["待回款", "已完成"],
+    "已完成": ["已完成"]
+  },
+  "escalation_defaults": {
+    "repeat_event_threshold": 2,
+    "open_exception_threshold": 2
+  },
   "rules": [
     {
       "event_type": "quotation.accepted",
+      "allowed_from": ["待确认", "已确认"],
       "status_after": "已确认",
       "sub_status": "商务条件锁定",
       "blocked": false,
       "next_owner_agent": "follow_up_agent",
-      "decision_summary": "报价已接受，订单进入确认与履约准备阶段。"
+      "decision_summary": "报价已接受，订单进入确认与履约准备阶段。",
+      "sla_hours": 8,
+      "escalation_strategy": "watch"
     },
     {
       "event_type": "order.confirmed",
+      "allowed_from": ["已确认", "待确认"],
       "status_after": "执行中",
       "sub_status": "待排产",
       "blocked": false,
       "next_owner_agent": "follow_up_agent",
-      "decision_summary": "订单已确认，转入履约推进与排产执行阶段。"
+      "decision_summary": "订单已确认，转入履约推进与排产执行阶段。",
+      "sla_hours": 4,
+      "escalation_strategy": "watch"
     },
     {
       "event_type": "production.milestone_delayed",
+      "allowed_from": ["执行中", "已确认"],
       "status_after": "执行中",
       "sub_status": "生产异常处理",
       "blocked": true,
       "next_owner_agent": "supply_chain_agent",
-      "decision_summary": "生产里程碑延期，订单维持执行中但进入异常推进状态。"
+      "decision_summary": "生产里程碑延期，订单维持执行中但进入异常推进状态。",
+      "sla_hours": 2,
+      "escalation_strategy": "immediate"
     },
     {
       "event_type": "shipment.ready",
+      "allowed_from": ["执行中", "待发货"],
       "status_after": "待发货",
       "sub_status": "待出运安排",
       "blocked": false,
       "next_owner_agent": "logistics_agent",
-      "decision_summary": "货物条件已满足，订单转入发货与交付安排阶段。"
+      "decision_summary": "货物条件已满足，订单转入发货与交付安排阶段。",
+      "sla_hours": 6,
+      "escalation_strategy": "watch"
     },
     {
       "event_type": "shipment.dispatched",
+      "allowed_from": ["待发货", "已发货"],
       "status_after": "运输 / 交付中",
       "sub_status": "已出运",
       "blocked": false,
       "next_owner_agent": "logistics_agent",
-      "decision_summary": "订单已发出，进入运输与在途交付阶段。"
+      "decision_summary": "订单已发出，进入运输与在途交付阶段。",
+      "sla_hours": 12,
+      "escalation_strategy": "watch"
     },
     {
       "event_type": "document.missing",
+      "allowed_from": ["待发货", "执行中"],
       "status_after": "待发货",
       "sub_status": "单证阻塞",
       "blocked": true,
       "next_owner_agent": "customs_agent",
-      "decision_summary": "单证缺失阻塞交付，订单停留在待发货阶段等待资料补齐。"
+      "decision_summary": "单证缺失阻塞交付，订单停留在待发货阶段等待资料补齐。",
+      "sla_hours": 4,
+      "escalation_strategy": "immediate"
     },
     {
       "event_type": "customs.rejected",
+      "allowed_from": ["待发货", "运输 / 交付中"],
       "status_after": "待发货",
       "sub_status": "清关阻塞",
       "blocked": true,
       "next_owner_agent": "customs_agent",
-      "decision_summary": "清关校验未通过，订单需要先完成合规修正再继续交付。"
+      "decision_summary": "清关校验未通过，订单需要先完成合规修正再继续交付。",
+      "sla_hours": 2,
+      "escalation_strategy": "immediate"
     },
     {
       "event_type": "logistics.delayed",
+      "allowed_from": ["已发货", "运输 / 交付中", "待发货"],
       "status_after": "运输 / 交付中",
       "sub_status": "运输异常处理",
       "blocked": true,
       "next_owner_agent": "logistics_agent",
-      "decision_summary": "物流时效偏差，订单仍在交付阶段但需异常协调。"
+      "decision_summary": "物流时效偏差，订单仍在交付阶段但需异常协调。",
+      "sla_hours": 4,
+      "escalation_strategy": "immediate"
     },
     {
       "event_type": "payment.due_soon",
+      "allowed_from": ["已发货", "运输 / 交付中", "待发货", "待回款"],
       "status_after": "待回款",
       "sub_status": "账期跟进中",
       "blocked": false,
       "next_owner_agent": "finance_agent",
-      "decision_summary": "订单已进入回款关注窗口，转由财务主导账期跟进。"
+      "decision_summary": "订单已进入回款关注窗口，转由财务主导账期跟进。",
+      "sla_hours": 24,
+      "escalation_strategy": "watch"
     },
     {
       "event_type": "payment.overdue",
+      "allowed_from": ["待回款", "待发货", "运输 / 交付中", "已发货"],
       "status_after": "待回款",
       "sub_status": "逾期催收中",
       "blocked": true,
       "next_owner_agent": "finance_agent",
-      "decision_summary": "订单回款逾期，订单进入资金风险处理状态。"
+      "decision_summary": "订单回款逾期，订单进入资金风险处理状态。",
+      "sla_hours": 2,
+      "escalation_strategy": "immediate"
     },
     {
       "event_type": "after_sales.complaint_created",
+      "allowed_from": ["已完成", "待回款", "运输 / 交付中", "待发货"],
       "status_after": "已完成",
       "sub_status": "售后处理中",
       "blocked": true,
       "next_owner_agent": "customer_service_agent",
-      "decision_summary": "订单进入售后闭环阶段，由客服主导投诉与服务处理。"
+      "decision_summary": "订单进入售后闭环阶段，由客服主导投诉与服务处理。",
+      "sla_hours": 2,
+      "escalation_strategy": "immediate"
     }
   ]
 }
