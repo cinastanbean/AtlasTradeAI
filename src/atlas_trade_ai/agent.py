@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from .llm import OpenAIEnhancer
+from .llm import create_enhancer
 from .models import AgentContext, AgentOutput
 from .rules import build_output, evaluate_context
 
@@ -11,7 +11,7 @@ class FollowUpAgent:
     """Hybrid follow-up agent with rules as the stable execution backbone."""
 
     def __init__(self) -> None:
-        self.enhancer = OpenAIEnhancer()
+        self.enhancer = create_enhancer()
         self.mode = os.getenv("ATLAS_AGENT_MODE", "hybrid")
 
     def run(self, context: AgentContext) -> AgentOutput:

@@ -6,22 +6,16 @@ from typing import Any
 from urllib import error, request
 
 
-def create_enhancer():
-    """根据配置创建对应的大模型增强器。"""
-    provider = os.getenv("ATLAS_LLM_PROVIDER", "openai").lower()
-    if provider == "zhipu":
-        from atlas_trade_ai.llm_zhipu import ZhipuEnhancer
+class ZhipuEnhancer:
+    """智谱 AI 大模型增强器，支持 GLM-4 系列模型。"""
 
-        return ZhipuEnhancer()
-    else:
-        return OpenAIEnhancer()
-
-
-class OpenAIEnhancer:
     def __init__(self) -> None:
-        self.api_key = os.getenv("OPENAI_API_KEY")
-        self.base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1/responses")
-        self.model = os.getenv("ATLAS_AGENT_MODEL", "gpt-5-mini")
+        self.api_key = os.getenv("ZHIPU_API_KEY")
+        self.base_url = os.getenv(
+            "ZHIPU_BASE_URL",
+            "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+        )
+        self.model = os.getenv("ATLAS_AGENT_MODEL", "glm-4-air")
 
     def is_enabled(self) -> bool:
         return bool(self.api_key)
@@ -32,8 +26,14 @@ class OpenAIEnhancer:
 
         payload = {
             "model": self.model,
-            "input": prompt,
-            "text": {"format": {"type": "json_object"}},
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            "temperature": 0.7,
+            "top_p": 0.9,
         }
         req = request.Request(
             self.base_url,
@@ -59,11 +59,7 @@ class OpenAIEnhancer:
             return None
 
     def _extract_text(self, payload: dict[str, Any]) -> str | None:
-        if "output_text" in payload and payload["output_text"]:
-            return payload["output_text"]
-        for item in payload.get("output", []):
-            for content in item.get("content", []):
-                text = content.get("text")
-                if text:
-                    return text
-        return None
+        choices = payload.get("choices", [])
+        if not choices:
+            return None
+        return choices[0].get("message", {}).get("content")

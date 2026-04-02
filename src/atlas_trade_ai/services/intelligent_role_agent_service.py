@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from atlas_trade_ai.llm import OpenAIEnhancer
+from atlas_trade_ai.llm import create_enhancer
 from atlas_trade_ai.services.agent_run_service import AgentRunService
 
 
@@ -20,7 +20,7 @@ class IntelligentRoleAgentService:
         self.agent_run_service = agent_run_service
         self.execution_mode = execution_mode
         self.intelligence_type = intelligence_type or "业务判断"
-        self.enhancer = OpenAIEnhancer()
+        self.enhancer = create_enhancer()
 
     def run(self, payload: dict) -> dict:
         event_type = payload["trigger_event"]["event_type"]

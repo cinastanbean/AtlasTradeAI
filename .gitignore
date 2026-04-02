@@ -29,8 +29,10 @@ coverage/
 node_modules/
 
 # Environment and local config
-.env
-.env.*
+.env                    # 忽略包含敏感信息的 .env 文件
+.env.local
+.env.*.local
+!*.env.example          # 允许 .env.example 文件被添加（配置示例）
 
 # Python cache (if any)
 __pycache__/
