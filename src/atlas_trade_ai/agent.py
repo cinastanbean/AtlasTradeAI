@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from .llm import create_enhancer
+from .llm import create_enhancer, get_provider_name
 from .models import AgentContext, AgentOutput
 from .rules import build_output, evaluate_context
 
@@ -25,6 +25,8 @@ class FollowUpAgent:
         context: AgentContext,
         output: AgentOutput,
     ) -> AgentOutput | None:
+        provider_name = get_provider_name(self.enhancer)
+        
         if self.mode == "rules":
             output.engine = {"mode": "rules", "provider": "rule-engine", "llm_used": False}
             return output
@@ -33,7 +35,7 @@ class FollowUpAgent:
                 "mode": "hybrid",
                 "provider": "rule-engine",
                 "llm_used": False,
-                "fallback_reason": "OPENAI_API_KEY 未配置",
+                "fallback_reason": f"{provider_name.upper()}_API_KEY 未配置",
             }
             return output
 
@@ -56,7 +58,7 @@ class FollowUpAgent:
         output.notification_draft = notification_draft
         output.engine = {
             "mode": "hybrid",
-            "provider": "openai",
+            "provider": provider_name,
             "llm_used": True,
             "model": self.enhancer.model,
         }

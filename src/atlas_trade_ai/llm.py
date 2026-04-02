@@ -17,7 +17,31 @@ def create_enhancer():
         return OpenAIEnhancer()
 
 
+def get_provider_name(enhancer: object) -> str:
+    """从增强器对象获取提供商名称。
+    
+    优先使用类的 provider 属性，如果不存在则从类名推断。
+    
+    Args:
+        enhancer: 增强器实例
+        
+    Returns:
+        小写的提供商名称，如 'openai', 'zhipu'
+    """
+    # 优先使用类属性
+    if hasattr(enhancer.__class__, 'provider'):
+        return enhancer.__class__.provider.lower()
+    
+    # 回退到从类名推断（保持向后兼容）
+    class_name = enhancer.__class__.__name__
+    if class_name.endswith('Enhancer'):
+        return class_name[:-8].lower()
+    return class_name.lower()
+
+
 class OpenAIEnhancer:
+    provider = "openai"  # 类属性，明确声明提供商名称
+    
     def __init__(self) -> None:
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1/responses")

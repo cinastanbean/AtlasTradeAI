@@ -8,6 +8,8 @@ from urllib import error, request
 
 class ZhipuEnhancer:
     """智谱 AI 大模型增强器，支持 GLM-4 系列模型。"""
+    
+    provider = "zhipu"  # 类属性，明确声明提供商名称
 
     def __init__(self) -> None:
         self.api_key = os.getenv("ZHIPU_API_KEY")

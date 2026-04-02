@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from atlas_trade_ai.llm import create_enhancer
+from atlas_trade_ai.llm import create_enhancer, get_provider_name
 from atlas_trade_ai.services.agent_run_service import AgentRunService
 
 
@@ -75,10 +75,12 @@ class IntelligentRoleAgentService:
         order: dict,
         customer: dict,
     ) -> dict:
+        provider_name = get_provider_name(self.enhancer)
+        
         if self.execution_mode != "hybrid":
             return result
         if not self.enhancer.is_enabled():
-            result["engine"]["fallback_reason"] = "OPENAI_API_KEY 未配置"
+            result["engine"]["fallback_reason"] = f"{provider_name.upper()}_API_KEY 未配置"
             return result
 
         prompt = f"""
@@ -111,7 +113,7 @@ Agent: {self.agent_name}
         result["notification_draft"] = enhanced.get("notification_draft") or result["notification_draft"]
         result["engine"] = {
             "mode": "hybrid",
-            "provider": "openai",
+            "provider": provider_name,
             "llm_used": True,
             "model": self.enhancer.model,
             "intelligence_type": self.intelligence_type,
