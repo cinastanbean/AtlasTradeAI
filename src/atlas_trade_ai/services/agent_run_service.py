@@ -34,3 +34,31 @@ class AgentRunService:
         if agent_name:
             items = [item for item in items if item["agent_name"] == agent_name]
         return items
+
+    def query_runs(
+        self,
+        agent_name: str | None = None,
+        event_type: str | None = None,
+        order_id: str | None = None,
+        engine_provider: str | None = None,
+        limit: int | None = None,
+    ) -> list[dict]:
+        items = self.store.list_agent_runs()
+        if agent_name:
+            items = [item for item in items if item["agent_name"] == agent_name]
+        if event_type:
+            items = [item for item in items if item["trigger_event_type"] == event_type]
+        if order_id:
+            items = [item for item in items if item.get("order_id") == order_id]
+        if engine_provider:
+            items = [
+                item
+                for item in items
+                if (item.get("output_result", {}).get("engine") or {}).get("provider") == engine_provider
+            ]
+        if limit is not None:
+            items = items[:limit]
+        return items
+
+    def get_run(self, run_id: str) -> dict:
+        return next(item for item in self.store.list_agent_runs() if item["run_id"] == run_id)

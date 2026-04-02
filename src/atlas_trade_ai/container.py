@@ -24,6 +24,7 @@ from atlas_trade_ai.services.overview_service import OverviewService
 from atlas_trade_ai.services.rule_registry_service import RuleRegistryService
 from atlas_trade_ai.services.sla_monitor_service import SlaMonitorService
 from atlas_trade_ai.services.task_service import TaskService
+from atlas_trade_ai.services.task_monitor_service import TaskMonitorService
 from atlas_trade_ai.services.workbench_service import WorkbenchService
 from atlas_trade_ai.services.workflow_service import WorkflowService
 
@@ -46,9 +47,11 @@ class AppContainer:
         )
         self.order_progress_service = OrderProgressService(self.store)
         self.orchestration_monitor_service = OrchestrationMonitorService(self.store)
-        self.task_service = TaskService(self.store)
+        self.integration_service = IntegrationService()
+        self.task_service = TaskService(self.store, self.integration_service.dingtalk)
+        self.task_monitor_service = TaskMonitorService(self.store, self.config_loader)
         self.exception_service = ExceptionService(self.store)
-        self.notification_service = NotificationService(self.store)
+        self.notification_service = NotificationService(self.store, self.integration_service.dingtalk)
         self.sla_monitor_service = SlaMonitorService(
             self.store,
             self.task_service,
@@ -71,7 +74,6 @@ class AppContainer:
         )
         self.overview_service = OverviewService()
         self.workbench_service = WorkbenchService(self.store)
-        self.integration_service = IntegrationService()
         self.dashboard_service = DashboardService(self.store)
         self.demo_scenario_service = DemoScenarioService(self.config_loader, self.event_service)
 

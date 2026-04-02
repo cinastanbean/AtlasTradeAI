@@ -36,6 +36,7 @@ class IntegrationService:
 
     def get_dingtalk_snapshot(self) -> dict:
         return {
+            "health": [asdict(self.dingtalk.health())],
             "todos": self.dingtalk.list_todos(),
             "messages": self.dingtalk.list_messages(),
             "approvals": self.dingtalk.list_approvals(),

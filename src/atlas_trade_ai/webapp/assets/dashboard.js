@@ -1,5 +1,6 @@
 import {
   getAgentRuns,
+  getCompositeRisks,
   getEscalations,
   getScenarios,
   getSlaOverdue,
@@ -56,12 +57,13 @@ function renderList(selector, items, renderItem) {
 }
 
 async function loadDashboard() {
-  const [summary, runs, scenarios, escalations, slaOverdue] = await Promise.all([
+  const [summary, runs, scenarios, escalations, slaOverdue, compositeRisks] = await Promise.all([
     getWorkbench(),
     getAgentRuns(),
     getScenarios(),
     getEscalations(),
     getSlaOverdue(),
+    getCompositeRisks(),
   ]);
   renderKpis(summary);
   renderProcessMap();
@@ -105,6 +107,19 @@ async function loadDashboard() {
         <h3>${item.order_no}</h3>
         <p>已超时 ${item.overdue_hours} 小时 / 级别 ${item.escalation_level || "-"}</p>
         <p>下一责任 Agent: ${item.next_owner_agent || "-"}</p>
+      </div>
+    `
+  );
+  renderList(
+    "#composite-risk-chart",
+    compositeRisks.length ? compositeRisks : [{ signal: "暂无复合风险", count: 0 }],
+    (item) => `
+      <div class="list-card">
+        <h3>${item.signal}</h3>
+        <div class="bar-row">
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(item.count * 18, 6)}px"></div></div>
+          <span>${item.count}</span>
+        </div>
       </div>
     `
   );

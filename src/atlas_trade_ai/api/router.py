@@ -22,6 +22,7 @@ from atlas_trade_ai.api.routes import (
     rules,
     sla_monitor,
     tasks,
+    task_monitor,
     workbench,
 )
 
@@ -33,6 +34,7 @@ api_router.include_router(orders.router)
 api_router.include_router(order_progress.router)
 api_router.include_router(order_orchestrator.router)
 api_router.include_router(tasks.router)
+api_router.include_router(task_monitor.router)
 api_router.include_router(exceptions.router)
 api_router.include_router(events.router)
 api_router.include_router(agents.router)

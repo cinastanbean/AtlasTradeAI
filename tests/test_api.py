@@ -69,6 +69,28 @@ def test_workbench_escalations_endpoint() -> None:
     assert isinstance(payload["data"], list)
 
 
+def test_workbench_composite_risks_endpoint() -> None:
+    client.post(
+        "/api/events",
+        json={
+            "event_type": "logistics.delayed",
+            "event_time": "2026-04-02T09:00:00+08:00",
+            "source_system": "atlas_trade_ai",
+            "biz_object_type": "order",
+            "biz_object_id": "ord_002",
+            "order_id": "ord_002",
+            "customer_id": "cus_002",
+            "priority": "P2",
+            "payload": {"eta_delay_days": 3},
+        },
+    )
+    client.post("/api/demo/scenarios/payment_overdue_ord_002/run")
+    response = client.get("/api/workbench/composite-risks")
+    assert response.status_code == 200
+    payload = response.json()
+    assert any(item["signal"] == "delivery_finance_compound_risk" for item in payload["data"])
+
+
 def test_workbench_sla_overdue_endpoint() -> None:
     client.post("/api/demo/scenarios/doc_missing_ord_002/run")
     response = client.get("/api/workbench/sla-overdue?now_iso=2026-04-02T18:00:00+08:00")
@@ -126,6 +148,12 @@ def test_frontend_agents_page_endpoint() -> None:
     assert "Agent 监控中台" in response.text
 
 
+def test_frontend_tasks_page_endpoint() -> None:
+    response = client.get("/ui/tasks.html")
+    assert response.status_code == 200
+    assert "负责人任务台" in response.text
+
+
 def test_agent_catalog_endpoint() -> None:
     response = client.get("/api/agents/catalog")
     assert response.status_code == 200
@@ -141,6 +169,13 @@ def test_agent_monitor_endpoint() -> None:
     payload = response.json()
     assert payload["data"]["agent_count"] >= 10
     assert isinstance(payload["data"]["agent_cards"], list)
+
+
+def test_task_owner_view_endpoint() -> None:
+    response = client.get("/api/tasks/owners")
+    assert response.status_code == 200
+    payload = response.json()
+    assert "owners" in payload["data"]
 
 
 def test_order_progress_endpoint() -> None:

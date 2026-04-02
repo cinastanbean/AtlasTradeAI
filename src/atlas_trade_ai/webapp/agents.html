@@ -13,6 +13,7 @@
         <nav class="nav">
           <a class="nav-link" href="/ui/index.html">总览</a>
           <a class="nav-link" href="/ui/orders.html">订单看板</a>
+          <a class="nav-link" href="/ui/tasks.html">负责人任务台</a>
           <a class="nav-link active" href="/ui/agents.html">Agent 运行</a>
           <a class="nav-link" href="/ui/integrations.html">系统集成</a>
         </nav>
@@ -29,6 +30,20 @@
         </header>
 
         <section id="agent-kpis" class="kpi-grid"></section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>日志筛选</h2>
+            <span>按 Agent、事件、订单与引擎筛选运行记录</span>
+          </div>
+          <div class="filter-bar">
+            <input id="filter-agent-name" placeholder="Agent 名称" />
+            <input id="filter-event-type" placeholder="事件类型" />
+            <input id="filter-order-id" placeholder="订单ID" />
+            <input id="filter-engine-provider" placeholder="引擎 provider" />
+            <button id="apply-run-filters">筛选</button>
+          </div>
+        </section>
 
         <section class="grid two-col">
           <div class="panel">
@@ -53,6 +68,14 @@
             <span>运行次数、最近执行、引擎来源</span>
           </div>
           <div id="agent-performance" class="list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>日志详情下钻</h2>
+            <span>点击某条运行日志查看输入输出细节</span>
+          </div>
+          <pre id="agent-run-detail" class="code-block"></pre>
         </section>
       </main>
     </div>

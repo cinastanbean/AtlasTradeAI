@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from atlas_trade_ai.adapters.dingtalk import DingTalkAdapter
 from atlas_trade_ai.core.store import SQLiteStore
 
 
 class TaskService:
-    def __init__(self, store: SQLiteStore) -> None:
+    def __init__(self, store: SQLiteStore, dingtalk_adapter: DingTalkAdapter | None = None) -> None:
         self.store = store
+        self.dingtalk_adapter = dingtalk_adapter
 
     def create_task(self, payload: dict) -> dict:
         existing = self.find_open_task(
@@ -31,6 +33,19 @@ class TaskService:
             "task_status": "待处理",
             "created_at": datetime.now().astimezone().isoformat(),
         }
+        if self.dingtalk_adapter is not None:
+            try:
+                todo = self.dingtalk_adapter.create_todo(
+                    {
+                        "subject": item["task_title"],
+                        "description": item.get("task_description"),
+                        "assigneeId": item.get("assignee_id"),
+                        "sourceId": item["task_id"],
+                    }
+                )
+                item["dingtalk_todo"] = todo
+            except Exception as exc:  # noqa: BLE001
+                item["dingtalk_todo"] = {"success": False, "error": str(exc)}
         return self.store.save_task(item)
 
     def find_open_task(

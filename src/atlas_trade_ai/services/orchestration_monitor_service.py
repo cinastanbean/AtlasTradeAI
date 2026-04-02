@@ -42,3 +42,15 @@ class OrchestrationMonitorService:
             )
         )
         return results
+
+    def get_composite_risk_stats(self) -> list[dict]:
+        stats: dict[str, int] = {}
+        for order in self.store.list_orders():
+            orchestration = order.get("last_orchestration") or {}
+            escalation = orchestration.get("escalation") or {}
+            for signal in escalation.get("composite_signals", []):
+                stats[signal] = stats.get(signal, 0) + 1
+        return [
+            {"signal": signal, "count": count}
+            for signal, count in sorted(stats.items(), key=lambda item: item[1], reverse=True)
+        ]

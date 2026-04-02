@@ -84,7 +84,9 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 ### 承接动作
 
 - `GET /api/tasks`
+- `GET /api/tasks/owners`
 - `POST /api/tasks`
+- `POST /api/tasks/{task_id}/status`
 - `GET /api/exceptions`
 - `POST /api/exceptions`
 
@@ -92,6 +94,7 @@ PYTHONPATH=src uvicorn atlas_trade_ai.app:app --reload
 
 - `POST /api/agents/follow-up/run`
 - `GET /api/agent-runs`
+- `GET /api/agent-runs/{run_id}`
 - `GET /api/agents/catalog`
 - `GET /api/agents/monitor`
 
@@ -177,6 +180,7 @@ PYTHONPATH=src python -m pytest -q
 
 - `/platform`
 - `/ui/orders.html`
+- `/ui/tasks.html`
 - `/ui/agents.html`
 - `/ui/integrations.html`
 - `/api/agents/monitor`

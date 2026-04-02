@@ -19,6 +19,7 @@
 - [Order Orchestrator 设计说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/order-orchestrator-design.md)
 - [统一事件模型设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/unified-event-model-design.md)
 - [系统集成与数据同步架构设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/system-integration-and-data-sync-design.md)
+- [钉钉真实接入说明](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/dingtalk-real-integration-guide.md)
 - [异常中心设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/exception-center-design.md)
 - [任务中心设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/task-center-design.md)
 - [钉钉通知与待办设计](/Users/jinniu/Documents/GitHub/AtlasTradeAI/docs/02-system-architecture/dingtalk-notification-and-todo-design.md)

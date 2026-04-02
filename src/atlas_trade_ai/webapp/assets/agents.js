@@ -1,7 +1,17 @@
-import { getAgentCatalog, getAgentMonitor, getAgentRuns } from "./api.js";
+import {
+  getAgentCatalog,
+  getAgentMonitor,
+  getAgentRunDetail,
+  getAgentRuns,
+  getFilteredAgentRuns,
+} from "./api.js";
 
-async function renderAgents() {
-  const [catalog, runs, monitor] = await Promise.all([getAgentCatalog(), getAgentRuns(), getAgentMonitor()]);
+async function renderAgents(filters = {}) {
+  const [catalog, runs, monitor] = await Promise.all([
+    getAgentCatalog(),
+    Object.keys(filters).length ? getFilteredAgentRuns(filters) : getAgentRuns(),
+    getAgentMonitor(),
+  ]);
   const kpis = [
     ["Agent 总数", monitor.agent_count],
     ["活跃 Agent", monitor.active_agent_count],
@@ -37,7 +47,7 @@ async function renderAgents() {
   document.querySelector("#agent-runs").innerHTML = runs
     .map(
       (item) => `
-      <div class="list-card">
+      <div class="list-card clickable-card" data-run-id="${item.run_id}">
         <h3>${item.agent_name}</h3>
         <p>订单: ${item.order_id || "-"}</p>
         <p>事件: ${item.trigger_event_type}</p>
@@ -47,6 +57,13 @@ async function renderAgents() {
     `
     )
     .join("");
+
+  document.querySelectorAll("[data-run-id]").forEach((item) => {
+    item.addEventListener("click", async () => {
+      const detail = await getAgentRunDetail(item.dataset.runId);
+      document.querySelector("#agent-run-detail").textContent = JSON.stringify(detail, null, 2);
+    });
+  });
 
   document.querySelector("#agent-performance").innerHTML = (monitor.agent_cards || [])
     .map(
@@ -63,5 +80,13 @@ async function renderAgents() {
     .join("");
 }
 
-document.querySelector("#refresh-agents").addEventListener("click", renderAgents);
+document.querySelector("#refresh-agents").addEventListener("click", () => renderAgents());
+document.querySelector("#apply-run-filters").addEventListener("click", () =>
+  renderAgents({
+    agent_name: document.querySelector("#filter-agent-name").value,
+    event_type: document.querySelector("#filter-event-type").value,
+    order_id: document.querySelector("#filter-order-id").value,
+    engine_provider: document.querySelector("#filter-engine-provider").value,
+  })
+);
 renderAgents();
