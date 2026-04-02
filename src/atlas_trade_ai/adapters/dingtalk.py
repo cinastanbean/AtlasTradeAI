@@ -99,6 +99,12 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return {"success": True, "mode": self.mode, "response": content}
+        except TimeoutError as e:
+            return {
+                "success": False,
+                "error": f"请求超时：{str(e)}",
+                "mode": self.mode,
+            }
         except urllib_error.HTTPError as e:
             return {
                 "success": False,
@@ -116,12 +122,6 @@ class DingTalkAdapter:
             return {
                 "success": False,
                 "error": f"JSON 解析错误：{str(e)}",
-                "mode": self.mode,
-            }
-        except TimeoutError as e:
-            return {
-                "success": False,
-                "error": f"请求超时：{str(e)}",
                 "mode": self.mode,
             }
         except Exception as e:
@@ -145,6 +145,12 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return {"success": True, "mode": self.mode, "todo_id": content.get("id"), "response": content}
+        except TimeoutError as e:
+            return {
+                "success": False,
+                "error": f"请求超时：{str(e)}",
+                "mode": self.mode,
+            }
         except urllib_error.HTTPError as e:
             return {
                 "success": False,
@@ -164,12 +170,6 @@ class DingTalkAdapter:
                 "error": f"JSON 解析错误：{str(e)}",
                 "mode": self.mode,
             }
-        except TimeoutError as e:
-            return {
-                "success": False,
-                "error": f"请求超时：{str(e)}",
-                "mode": self.mode,
-            }
         except Exception as e:
             return {"success": False, "error": f"未知错误：{str(e)}", "mode": self.mode}
 
@@ -185,14 +185,14 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return content["accessToken"]
+        except TimeoutError as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：请求超时 - {str(e)}") from e
         except urllib_error.HTTPError as e:
             raise RuntimeError(f"获取钉钉访问令牌失败：HTTP {e.code} - {e.reason}") from e
         except urllib_error.URLError as e:
             raise RuntimeError(f"获取钉钉访问令牌失败：网络错误 - {e.reason}") from e
         except json.JSONDecodeError as e:
             raise RuntimeError(f"获取钉钉访问令牌失败：JSON 解析错误 - {str(e)}") from e
-        except TimeoutError as e:
-            raise RuntimeError(f"获取钉钉访问令牌失败：请求超时 - {str(e)}") from e
         except Exception as e:
             raise RuntimeError(f"获取钉钉访问令牌失败：未知错误 - {str(e)}") from e
 
