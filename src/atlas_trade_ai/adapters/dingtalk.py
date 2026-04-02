@@ -7,6 +7,7 @@ import json
 import os
 import time
 import urllib.parse
+from urllib import error as urllib_error
 from urllib import request
 
 from atlas_trade_ai.adapters.base import AdapterHealth
@@ -98,13 +99,38 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return {"success": True, "mode": self.mode, "response": content}
+        except urllib_error.HTTPError as e:
+            return {
+                "success": False,
+                "error": f"HTTP 错误：{e.code} - {e.reason}",
+                "mode": self.mode,
+                "http_status": e.code,
+            }
+        except urllib_error.URLError as e:
+            return {
+                "success": False,
+                "error": f"网络错误：{e.reason}",
+                "mode": self.mode,
+            }
+        except json.JSONDecodeError as e:
+            return {
+                "success": False,
+                "error": f"JSON 解析错误：{str(e)}",
+                "mode": self.mode,
+            }
+        except TimeoutError as e:
+            return {
+                "success": False,
+                "error": f"请求超时：{str(e)}",
+                "mode": self.mode,
+            }
         except Exception as e:
-            return {"success": False, "error": str(e), "mode": self.mode}
+            return {"success": False, "error": f"未知错误：{str(e)}", "mode": self.mode}
 
     def _create_real_todo(self, payload: dict) -> dict:
         try:
             access_token = self._get_access_token()
-        except Exception as e:
+        except RuntimeError as e:
             return {"success": False, "error": f"获取访问令牌失败：{str(e)}", "mode": self.mode}
         req = request.Request(
             self.todo_create_url,
@@ -119,8 +145,33 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return {"success": True, "mode": self.mode, "todo_id": content.get("id"), "response": content}
+        except urllib_error.HTTPError as e:
+            return {
+                "success": False,
+                "error": f"HTTP 错误：{e.code} - {e.reason}",
+                "mode": self.mode,
+                "http_status": e.code,
+            }
+        except urllib_error.URLError as e:
+            return {
+                "success": False,
+                "error": f"网络错误：{e.reason}",
+                "mode": self.mode,
+            }
+        except json.JSONDecodeError as e:
+            return {
+                "success": False,
+                "error": f"JSON 解析错误：{str(e)}",
+                "mode": self.mode,
+            }
+        except TimeoutError as e:
+            return {
+                "success": False,
+                "error": f"请求超时：{str(e)}",
+                "mode": self.mode,
+            }
         except Exception as e:
-            return {"success": False, "error": str(e), "mode": self.mode}
+            return {"success": False, "error": f"未知错误：{str(e)}", "mode": self.mode}
 
     def _get_access_token(self) -> str:
         body = {"appKey": self.client_id, "appSecret": self.client_secret}
@@ -134,8 +185,16 @@ class DingTalkAdapter:
             with request.urlopen(req, timeout=15) as resp:
                 content = json.loads(resp.read().decode("utf-8"))
             return content["accessToken"]
+        except urllib_error.HTTPError as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：HTTP {e.code} - {e.reason}") from e
+        except urllib_error.URLError as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：网络错误 - {e.reason}") from e
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：JSON 解析错误 - {str(e)}") from e
+        except TimeoutError as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：请求超时 - {str(e)}") from e
         except Exception as e:
-            raise RuntimeError(f"获取钉钉访问令牌失败：{str(e)}") from e
+            raise RuntimeError(f"获取钉钉访问令牌失败：未知错误 - {str(e)}") from e
 
     def _signed_webhook_url(self) -> str:
         if not self.webhook_secret:
