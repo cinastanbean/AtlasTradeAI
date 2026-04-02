@@ -94,12 +94,18 @@ class DingTalkAdapter:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with request.urlopen(req, timeout=15) as resp:
-            content = json.loads(resp.read().decode("utf-8"))
-        return {"success": True, "mode": self.mode, "response": content}
+        try:
+            with request.urlopen(req, timeout=15) as resp:
+                content = json.loads(resp.read().decode("utf-8"))
+            return {"success": True, "mode": self.mode, "response": content}
+        except Exception as e:
+            return {"success": False, "error": str(e), "mode": self.mode}
 
     def _create_real_todo(self, payload: dict) -> dict:
-        access_token = self._get_access_token()
+        try:
+            access_token = self._get_access_token()
+        except Exception as e:
+            return {"success": False, "error": f"获取访问令牌失败：{str(e)}", "mode": self.mode}
         req = request.Request(
             self.todo_create_url,
             data=json.dumps(payload).encode("utf-8"),
@@ -109,9 +115,12 @@ class DingTalkAdapter:
             },
             method="POST",
         )
-        with request.urlopen(req, timeout=15) as resp:
-            content = json.loads(resp.read().decode("utf-8"))
-        return {"success": True, "mode": self.mode, "todo_id": content.get("id"), "response": content}
+        try:
+            with request.urlopen(req, timeout=15) as resp:
+                content = json.loads(resp.read().decode("utf-8"))
+            return {"success": True, "mode": self.mode, "todo_id": content.get("id"), "response": content}
+        except Exception as e:
+            return {"success": False, "error": str(e), "mode": self.mode}
 
     def _get_access_token(self) -> str:
         body = {"appKey": self.client_id, "appSecret": self.client_secret}
@@ -121,9 +130,12 @@ class DingTalkAdapter:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with request.urlopen(req, timeout=15) as resp:
-            content = json.loads(resp.read().decode("utf-8"))
-        return content["accessToken"]
+        try:
+            with request.urlopen(req, timeout=15) as resp:
+                content = json.loads(resp.read().decode("utf-8"))
+            return content["accessToken"]
+        except Exception as e:
+            raise RuntimeError(f"获取钉钉访问令牌失败：{str(e)}") from e
 
     def _signed_webhook_url(self) -> str:
         if not self.webhook_secret:
