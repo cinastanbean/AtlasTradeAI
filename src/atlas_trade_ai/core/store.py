@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
+from threading import Lock
 from typing import Any
 
 
@@ -12,6 +13,7 @@ class SQLiteStore:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
+        self._lock = Lock()  # 添加线程锁
         self._create_schema()
 
     def _create_schema(self) -> None:
@@ -180,6 +182,22 @@ class SQLiteStore:
     def _dump(self, item: dict[str, Any]) -> str:
         return json.dumps(item, ensure_ascii=False)
 
+    def _safe_execute(self, query: str, params: tuple = ()) -> list[sqlite3.Row]:
+        """线程安全的查询执行，确保 row_factory 已设置。"""
+        with self._lock:
+            # 确保 row_factory 已设置
+            if self.conn.row_factory != sqlite3.Row:
+                self.conn.row_factory = sqlite3.Row
+            return self.conn.execute(query, params).fetchall()
+
+    def _safe_execute_one(self, query: str, params: tuple = ()) -> sqlite3.Row | None:
+        """线程安全的查询单行，确保 row_factory 已设置。"""
+        with self._lock:
+            # 确保 row_factory 已设置
+            if self.conn.row_factory != sqlite3.Row:
+                self.conn.row_factory = sqlite3.Row
+            return self.conn.execute(query, params).fetchone()
+
     def _load_row(self, row: sqlite3.Row | None) -> dict[str, Any] | None:
         if row is None:
             return None
@@ -205,16 +223,14 @@ class SQLiteStore:
         return item
 
     def list_customers(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM customers ORDER BY customer_id"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM customers ORDER BY customer_id")
         return [json.loads(row["data"]) for row in rows]
 
     def get_customer(self, customer_id: str) -> dict[str, Any]:
-        row = self.conn.execute(
+        row = self._safe_execute_one(
             "SELECT data FROM customers WHERE customer_id = ?",
             (customer_id,),
-        ).fetchone()
+        )
         if row is None:
             raise KeyError(customer_id)
         return json.loads(row["data"])
@@ -246,16 +262,14 @@ class SQLiteStore:
         return item
 
     def list_orders(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM orders ORDER BY order_no"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM orders ORDER BY order_no")
         return [json.loads(row["data"]) for row in rows]
 
     def get_order(self, order_id: str) -> dict[str, Any]:
-        row = self.conn.execute(
+        row = self._safe_execute_one(
             "SELECT data FROM orders WHERE order_id = ?",
             (order_id,),
-        ).fetchone()
+        )
         if row is None:
             raise KeyError(order_id)
         return json.loads(row["data"])
@@ -284,9 +298,7 @@ class SQLiteStore:
         return item
 
     def list_tasks(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM tasks ORDER BY task_id DESC"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM tasks ORDER BY task_id DESC")
         return [json.loads(row["data"]) for row in rows]
 
     def save_exception(self, item: dict[str, Any]) -> dict[str, Any]:
@@ -313,9 +325,7 @@ class SQLiteStore:
         return item
 
     def list_exceptions(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM exceptions ORDER BY exception_id DESC"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM exceptions ORDER BY exception_id DESC")
         return [json.loads(row["data"]) for row in rows]
 
     def save_event(self, item: dict[str, Any]) -> dict[str, Any]:
@@ -341,9 +351,9 @@ class SQLiteStore:
         return item
 
     def list_events(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
+        rows = self._safe_execute(
             "SELECT data FROM events ORDER BY COALESCE(event_time, created_at, event_id) DESC"
-        ).fetchall()
+        )
         return [json.loads(row["data"]) for row in rows]
 
     def save_agent_run(self, item: dict[str, Any]) -> dict[str, Any]:
@@ -366,9 +376,7 @@ class SQLiteStore:
         return item
 
     def list_agent_runs(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM agent_runs ORDER BY run_id DESC"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM agent_runs ORDER BY run_id DESC")
         return [json.loads(row["data"]) for row in rows]
 
     def save_notification(self, item: dict[str, Any]) -> dict[str, Any]:
@@ -391,7 +399,5 @@ class SQLiteStore:
         return item
 
     def list_notifications(self) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            "SELECT data FROM notifications ORDER BY notification_id DESC"
-        ).fetchall()
+        rows = self._safe_execute("SELECT data FROM notifications ORDER BY notification_id DESC")
         return [json.loads(row["data"]) for row in rows]
